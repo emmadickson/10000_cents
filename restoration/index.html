@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10000 Cents</title>
+  </head>
+  <body>
+    <svg id="bill"></svg>
+    <script>
+        var bill = document.getElementById('bill')
+        bill.style.width = '1000px'
+        bill.style.height = '800px'
+          y = 0;
+        for (var i = 0; i < 100; i++){
+            x = 0; 
+          
+            for (var j = 0; j < 100; j++){
+                var svgns = "http://www.w3.org/2000/svg";
+                var rect = document.createElementNS(svgns, 'rect');
+                rect.id = `${i}-${j}`
+                rect.setAttributeNS(null, 'x', x);
+                rect.setAttributeNS(null, 'y', y);
+                rect.setAttributeNS(null, 'height', '3.4');
+                rect.setAttributeNS(null, 'width', '8');
+                rect.setAttributeNS(null, 'fill', '#'+Math.round(0xffffff *         Math.random()).toString(16));
+                document.getElementById('bill').appendChild(rect);
+                x += 8
+            }
+            y += 3.4
+        }
+        document.getElementById('bill').addEventListener('click', function (event) {
+            console.log(event)
+            }, false);
+
+
+    </script>
+	<script src="index.js"></script>
+  </body>
+</html>
