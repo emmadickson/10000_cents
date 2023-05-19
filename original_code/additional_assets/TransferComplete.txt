@@ -1,0 +1,7 @@
+Transfer completed: Mon Oct 17 13:22:28 EDT 2022 
+Transfer name: Ten Thousand 
+Target: /Users/hussainj/Desktop/Ten Thousand.zip 
+Application used: Exactly 
+User: null 
+Total file count: 20112
+Total Bytes: 893412070
