@@ -13,36 +13,23 @@
         display: flex;
         justify-content: center;
       }
-      #canvas{
-        min-width: 800px;
-        max-height: 340px;
-      }
     </style>
   </head>
   <body>
     <div id="bill_container">
-      <canvas id="canvas"></canvas>
-
-
-      <video id="video" width="0"  muted autoplay>
-        <source src="data/bill.mov" type="video/mp4">
-      </video>
+     <svg id="bill">
+      <g>
+        <foreignObject x="0" y="0" width="800" height="340">
+          <video width="800"  muted autoplay>
+            <source src="data/bill.mov" type="video/mp4">
+          </video>
+        </foreignObject>
+      </g>
+    </svg> 
     </div>
    
     <script>
-        var canvas = document.getElementById('canvas');
-        var ctx = canvas.getContext('2d');
-        var video = document.getElementById('video');
-
-        video.addEventListener("play", () => {
-          function step() {
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            requestAnimationFrame(step);
-          }
-          requestAnimationFrame(step);
-        });
-
-
+     
       var individualImageWidth = 8;
       var individualImageHeight = 3.4;
       var billHeight =individualImageHeight * 100; 
@@ -56,7 +43,7 @@
        bill.style.width = `${billWidth}px`
        bill.style.height = `${billHeight}px`
 
-       var billBackground = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+      /* var billBackground = document.createElementNS('http://www.w3.org/2000/svg', 'image');
        billBackground.id = `billImage`
        billBackground.setAttributeNS(null, 'x', 0);
        billBackground.setAttributeNS(null, 'y', 0);
@@ -65,7 +52,7 @@
        billBackground.setAttributeNS(null, 'href', 'data/bill.png');
        billBackground.setAttribute('preserveAspectRatio', "xMidYMax slice")
        document.getElementById('bill').appendChild(billBackground);
-
+*/
        y = 0;
       
        for (var i = 1; i < 100; i++){
