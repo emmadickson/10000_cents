@@ -4,43 +4,88 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>10000 Cents</title>
+    <style>
+      body{
+        background-color: rgb(248,248,248);
+      }
+      #bill_container{
+        width:100%;
+        display: flex;
+        justify-content: center;
+      }
+      #canvas{
+        min-width: 800px;
+        max-height: 340px;
+      }
+    </style>
   </head>
   <body>
-    <svg id="bill"></svg>
+    <div id="bill_container">
+      <canvas id="canvas"></canvas>
+
+
+      <video id="video" width="0"  muted autoplay>
+        <source src="data/bill.mov" type="video/mp4">
+      </video>
+    </div>
+   
     <script>
-     
+        var canvas = document.getElementById('canvas');
+        var ctx = canvas.getContext('2d');
+        var video = document.getElementById('video');
+
+        video.addEventListener("play", () => {
+          function step() {
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            requestAnimationFrame(step);
+          }
+          requestAnimationFrame(step);
+        });
+
+
       var individualImageWidth = 8;
       var individualImageHeight = 3.4;
       var billHeight =individualImageHeight * 100; 
       var billWidth = individualImageWidth * 100;
-      var popupHeight = 100;
-      var popupWidth = 200;
+      var popupHeight = 90;
+      var popupWidth = 400;
 
       function setupBillSize(){
        
-        var bill = document.getElementById('bill')
-        bill.style.width = `${billWidth}px`
-        bill.style.height = `${billHeight}px`
-        
-        y = 0;
-       
-        for (var i = 1; i < 100; i++){
-            x = 0; 
-          
-            for (var j = 1; j < 100; j++){
-                var svgns = "http://www.w3.org/2000/svg";
-                var image = document.createElementNS(svgns, 'image');
-                image.id = `${j}.${i}`
-                image.setAttributeNS(null, 'x', x);
-                image.setAttributeNS(null, 'y', y);
-                image.setAttributeNS(null, 'height', individualImageHeight);
-                image.setAttributeNS(null, 'width', individualImageWidth);
-                image.setAttributeNS(null, 'href', `data/images/${j}.${i}.jpg`);
-                document.getElementById('bill').appendChild(image);
-                x += individualImageWidth
-            }
-            y += individualImageHeight
-        }
+       var bill = document.getElementById('bill')
+       bill.style.width = `${billWidth}px`
+       bill.style.height = `${billHeight}px`
+
+       var billBackground = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+       billBackground.id = `billImage`
+       billBackground.setAttributeNS(null, 'x', 0);
+       billBackground.setAttributeNS(null, 'y', 0);
+       billBackground.setAttributeNS(null, 'height', '100vh');
+       billBackground.setAttributeNS(null, 'width', '100vw');
+       billBackground.setAttributeNS(null, 'href', 'data/bill.png');
+       billBackground.setAttribute('preserveAspectRatio', "xMidYMax slice")
+       document.getElementById('bill').appendChild(billBackground);
+
+       y = 0;
+      
+       for (var i = 1; i < 100; i++){
+           x = 0; 
+         
+           for (var j = 1; j < 100; j++){
+               var svgns = "http://www.w3.org/2000/svg";
+               var rect = document.createElementNS(svgns, 'rect');
+               rect.id = `${j}.${i}`
+               rect.setAttributeNS(null, 'x', x);
+               rect.setAttributeNS(null, 'y', y);
+               rect.setAttributeNS(null, 'height', individualImageHeight);
+               rect.setAttributeNS(null, 'width', individualImageWidth);
+               rect.style.fill = 'rgb(255,255,255)'
+               rect.style.fillOpacity = '0'
+               document.getElementById('bill').appendChild(rect);
+               x += individualImageWidth
+           }
+           y += individualImageHeight
+       }
       }
 
       function getPopUpOrientation(clickedImage){
@@ -99,6 +144,28 @@
         return {'x': adjustedX, 'y': adjustedY}
       }
 
+      function createLeftHandSize(){
+        
+      }
+      function readTextFile(file) {
+        var rawFile = new XMLHttpRequest();
+        rawFile.open("GET", file, false);
+        rawFile.onreadystatechange = function () {
+          if(rawFile.readyState === 4)  {
+            if(rawFile.status === 200 || rawFile.status == 0) {
+              var allText = rawFile.responseText;
+              console.log(allText);
+            }
+          }
+        }
+        rawFile.send(null);
+      }
+      function rgbToHex(r, g, b) {
+        return "#" + (1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1);
+      }
+
+   
+ 
       function createPopUpBox(clickedImage){
        
         position = getPopUpOrientation(clickedImage)
@@ -111,7 +178,6 @@
           var parent = alreadyExists.parentNode
           parent.removeChild(alreadyExists)
         }
-
     
         var svgns = "http://www.w3.org/2000/svg";
         var popup = document.createElementNS(svgns, 'rect');
@@ -122,6 +188,70 @@
         popup.setAttributeNS(null, 'width', popupWidth);
 
         document.getElementById('bill').appendChild(popup);
+
+        var popupBillImage = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+        popupBillImage.id = `popupBillImage`
+        popupBillImage.setAttributeNS(null, 'x', adjustedPostion.x);
+        popupBillImage.setAttributeNS(null, 'y', adjustedPostion.y);
+        popupBillImage.setAttributeNS(null, 'height', popupHeight);
+        popupBillImage.setAttributeNS(null, 'width', popupWidth/2);
+        popupBillImage.setAttributeNS(null, 'href', `data/images/${clickedImage.id}.jpg`);
+       
+        document.getElementById('bill').appendChild(popupBillImage);
+      
+          fetch(`data/drawing_instructions/${clickedImage.id}.txt`)
+          .then((res) => res.text())
+          .then((text) => {
+            function parseCommand(){
+           
+              if ( i < commands.length - 1){
+                command = commands[i]
+                if (command.length > 0){
+                  parts = commands[i].split(".")
+                  
+                  if (parts[0] == 'c'){
+                    color = rgbToHex(parts[1], parts[2], parts[3])
+                  }
+
+                  else{
+                    if (parts[0] == 's'){
+                      thickness= parts[1] * 0.85*0.5
+                    }
+
+                    else {
+                        thickness = thickness
+                        var newLine = document.createElementNS('http://www.w3.org/2000/svg','line');
+                        newLine.setAttribute('id','line2');
+                        newLine.setAttribute('x1', adjustedPostion.x + popupWidth/2 + (parts[0] * scale));
+                        newLine.setAttribute('y1', adjustedPostion.y + (parts[1] * scale));
+                        newLine.setAttribute('x2', adjustedPostion.x + popupWidth/2 + (parts[2] * scale));
+                        newLine.setAttribute('y2', adjustedPostion.y + (parts[3] * scale));
+                        newLine.setAttribute("stroke", color)
+                        newLine.setAttribute("stroke-width", thickness)
+                        document.getElementById('bill').append(newLine);
+                    }
+                  }
+                }
+              }
+              i++
+              setTimeout(parseCommand, 50)
+              }
+
+            // do something with "text"
+            commands = text.split("drawing=")[1]
+
+            curCommand = 0;
+            thickness = 1;
+            color = 'black';
+            scale = 0.5
+            commands = commands.split("_");
+            numCommands = commands.length;
+            
+            var i = 0;
+
+            setTimeout(parseCommand,50)  
+          })
+          .catch((e) => console.error(e));
       
 
       }
@@ -129,10 +259,7 @@
       setupBillSize()
 
       document.getElementById('bill').addEventListener('click', function (event) {
-        
-        console.log(event.srcElement)
         createPopUpBox(event.srcElement)
-
       }, false);
 
     </script>
