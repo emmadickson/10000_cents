@@ -155,22 +155,26 @@
         centerPos = calculateCenterOfBox(clickedImage.id)
         adjustedPostion = adjustXYPos(centerPos, position)
 
-        var alreadyExists = document.getElementById('popup');
-     
+        var alreadyExists = document.getElementById('popupContainer');
+
         if (alreadyExists){
           var parent = alreadyExists.parentNode
+          console.log(alreadyExists)
           parent.removeChild(alreadyExists)
         }
     
         var svgns = "http://www.w3.org/2000/svg";
+        var popupContainer = document.createElementNS(svgns, 'g');
+        popupContainer.id = "popupContainer"
+       
         var popup = document.createElementNS(svgns, 'rect');
         popup.id = 'popup'
         popup.setAttributeNS(null, 'x', adjustedPostion.x);
         popup.setAttributeNS(null, 'y', adjustedPostion.y);
         popup.setAttributeNS(null, 'height', popupHeight);
         popup.setAttributeNS(null, 'width', popupWidth);
-
-        document.getElementById('bill').appendChild(popup);
+        popup.style = 'fill: rgb(255,255,255,);'
+        popupContainer.appendChild(popup)
 
         var popupBillImage = document.createElementNS('http://www.w3.org/2000/svg', 'image');
         popupBillImage.id = `popupBillImage`
@@ -179,63 +183,63 @@
         popupBillImage.setAttributeNS(null, 'height', popupHeight);
         popupBillImage.setAttributeNS(null, 'width', popupWidth/2);
         popupBillImage.setAttributeNS(null, 'href', `data/images/${clickedImage.id}.jpg`);
-       
-        document.getElementById('bill').appendChild(popupBillImage);
+        popupContainer.appendChild(popupBillImage);
       
-          fetch(`data/drawing_instructions/${clickedImage.id}.txt`)
-          .then((res) => res.text())
-          .then((text) => {
-            function parseCommand(){
-           
-              if ( i < commands.length - 1){
-                command = commands[i]
-                if (command.length > 0){
-                  parts = commands[i].split(".")
-                  
-                  if (parts[0] == 'c'){
-                    color = rgbToHex(parts[1], parts[2], parts[3])
+        fetch(`data/drawing_instructions/${clickedImage.id}.txt`)
+        .then((res) => res.text())
+        .then((text) => {
+          function parseCommand(){
+          
+            if ( i < commands.length - 1){
+              command = commands[i]
+              if (command.length > 0){
+                parts = commands[i].split(".")
+                
+                if (parts[0] == 'c'){
+                  color = rgbToHex(parts[1], parts[2], parts[3])
+                }
+
+                else{
+                  if (parts[0] == 's'){
+                    thickness= parts[1] * 0.85*0.5
                   }
 
-                  else{
-                    if (parts[0] == 's'){
-                      thickness= parts[1] * 0.85*0.5
-                    }
-
-                    else {
-                        thickness = thickness
-                        var newLine = document.createElementNS('http://www.w3.org/2000/svg','line');
-                        newLine.setAttribute('id','line2');
-                        newLine.setAttribute('x1', adjustedPostion.x + popupWidth/2 + (parts[0] * scale));
-                        newLine.setAttribute('y1', adjustedPostion.y + (parts[1] * scale));
-                        newLine.setAttribute('x2', adjustedPostion.x + popupWidth/2 + (parts[2] * scale));
-                        newLine.setAttribute('y2', adjustedPostion.y + (parts[3] * scale));
-                        newLine.setAttribute("stroke", color)
-                        newLine.setAttribute("stroke-width", thickness)
-                        document.getElementById('bill').append(newLine);
-                    }
+                  else {
+                      thickness = thickness
+                      var newLine = document.createElementNS('http://www.w3.org/2000/svg','line');
+                      newLine.setAttribute('id','line2');
+                      newLine.setAttribute('x1', adjustedPostion.x + popupWidth/2 + (parts[0] * scale));
+                      newLine.setAttribute('y1', adjustedPostion.y + (parts[1] * scale));
+                      newLine.setAttribute('x2', adjustedPostion.x + popupWidth/2 + (parts[2] * scale));
+                      newLine.setAttribute('y2', adjustedPostion.y + (parts[3] * scale));
+                      newLine.setAttribute("stroke", color)
+                      newLine.setAttribute("stroke-width", 14)
+                      popupContainer.append(newLine);
                   }
                 }
               }
-              i++
-              setTimeout(parseCommand, 10)
-              }
+            }
+            i++
+            setTimeout(parseCommand, 10)
+            }
 
-            // do something with "text"
-            commands = text.split("drawing=")[1]
+          // do something with "text"
+          commands = text.split("drawing=")[1]
 
-            curCommand = 0;
-            thickness = 1;
-            color = 'black';
-            scale = 0.5
-            commands = commands.split("_");
-            numCommands = commands.length;
-            
-            var i = 0;
+          curCommand = 0;
+          thickness = 1;
+          color = 'black';
+          scale = 0.5
+          commands = commands.split("_");
+          numCommands = commands.length;
+          
+          var i = 0;
 
-            setTimeout(parseCommand,10)  
-          })
-          .catch((e) => console.error(e));
+          setTimeout(parseCommand,10)  
+        })
+        .catch((e) => console.error(e));
       
+        document.getElementById('bill').appendChild(popupContainer);
 
       }
 
@@ -255,8 +259,7 @@
       }, false);
 
       document.getElementById('bill').addEventListener('mouseout', function (event) {
-        console.log(event.srcElement)
-        console.log(event.srcElement.x)
+        //console.log(event.srcElement)
         xValue = event.srcElement.x.baseVal.value
         yValue = event.srcElement.y.baseVal.value
 
