@@ -21,13 +21,14 @@
      
    
       <svg id="bill">
-        <g  id="billContainer">
+        <g  id="videoContainer">
           <foreignobject  id="billForeignObject" x="0" y="0" width="800" height="340">
             <video width="800" height="340" autoplay="true" muted="true" >
               <source src="data/bill.mov" type="video/mp4">
             </video>
           </foreignobject>
         </g>
+        <g  id="billContainer"></g>
       </svg> 
 
     </div>
@@ -66,9 +67,8 @@
                 rect.setAttributeNS(null, 'y', y);
                 rect.setAttributeNS(null, 'height', individualImageHeight);
                 rect.setAttributeNS(null, 'width', individualImageWidth);
-                rect.style.fill = 'rgb(255,255,255)'
-                rect.style.fillOpacity = '0'
-                document.getElementById('bill').appendChild(rect);
+                rect.style.fill = 'rgb(255,255,255,0)'
+                document.getElementById('billContainer').appendChild(rect);
                 x += individualImageWidth
             }
             y += individualImageHeight
@@ -131,9 +131,6 @@
         return {'x': adjustedX, 'y': adjustedY}
       }
 
-      function createLeftHandSize(){
-        
-      }
       function readTextFile(file) {
         var rawFile = new XMLHttpRequest();
         rawFile.open("GET", file, false);
@@ -147,12 +144,11 @@
         }
         rawFile.send(null);
       }
+      
       function rgbToHex(r, g, b) {
         return "#" + (1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1);
       }
 
-   
- 
       function createPopUpBox(clickedImage){
        
         position = getPopUpOrientation(clickedImage)
@@ -221,7 +217,7 @@
                 }
               }
               i++
-              setTimeout(parseCommand, 50)
+              setTimeout(parseCommand, 10)
               }
 
             // do something with "text"
@@ -236,7 +232,7 @@
             
             var i = 0;
 
-            setTimeout(parseCommand,50)  
+            setTimeout(parseCommand,10)  
           })
           .catch((e) => console.error(e));
       
@@ -247,6 +243,26 @@
 
       document.getElementById('bill').addEventListener('click', function (event) {
         createPopUpBox(event.srcElement)
+      }, false);
+
+      document.getElementById('bill').addEventListener('mouseover', function (event) {
+        xValue = event.srcElement.x.baseVal.value
+        yValue = event.srcElement.y.baseVal.value
+
+        if (xValue > edgeMargin && yValue > edgeMargin){
+          event.srcElement.style="fill: rgb(255,255,255,0); stroke:red; stroke-width:0.5;" 
+        }
+      }, false);
+
+      document.getElementById('bill').addEventListener('mouseout', function (event) {
+        console.log(event.srcElement)
+        console.log(event.srcElement.x)
+        xValue = event.srcElement.x.baseVal.value
+        yValue = event.srcElement.y.baseVal.value
+
+        if (xValue > edgeMargin && yValue > edgeMargin){
+          event.srcElement.style="fill: rgb(255,255,255,0)" 
+        }
       }, false);
 
     </script>
