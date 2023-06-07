@@ -75,14 +75,15 @@
         }
      }
 
-      function getPopUpOrientation(clickedImage){
-        clickedImageXPos = clickedImage.getAttribute('x')
-        clickedImageYPos = clickedImage.getAttribute('y')
-
-        var midXPoint = billWidth/2
-        var midYPoint = billHeight/2
+      function getPopUpOrientation(clickedImage, billCoordinates){
+        clickedImageXPos = clickedImage.getAttribute('x') - edgeMargin
+        clickedImageYPos = clickedImage.getAttribute('y') - edgeMargin
+     
+        var midXPoint = (billCoordinates.x2-billCoordinates.x1)/2
+        var midYPoint = (billCoordinates.y2-billCoordinates.y1)/2
         var position;
-
+        console.log(midXPoint)
+        console.log(midYPoint)
         if (clickedImageXPos > midXPoint && clickedImageYPos < midYPoint){
           position = 'topRight'
         }
@@ -95,7 +96,9 @@
         else if (clickedImageXPos < midXPoint && clickedImageYPos > midYPoint){
           position = 'bottomLeft'
         }
+        console.log(position)
         return position
+    
       }
 
       function calculateCenterOfBox(id){
@@ -149,123 +152,139 @@
         return "#" + (1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1);
       }
 
+      function getBillCoordinates(){
+        return {'x1': edgeMargin, 'y1': edgeMargin, 'x2': billWidth + edgeMargin, 'y2': billHeight + edgeMargin}
+      }
+
       function createPopUpBox(clickedImage){
-       
-        position = getPopUpOrientation(clickedImage)
-        centerPos = calculateCenterOfBox(clickedImage.id)
-        adjustedPostion = adjustXYPos(centerPos, position)
+        event.srcElement.style="fill: red; stroke:red; stroke-width:1;" 
 
-        var alreadyExists = document.getElementById('popupContainer');
-
-        if (alreadyExists){
-          var parent = alreadyExists.parentNode
-          console.log(alreadyExists)
-          parent.removeChild(alreadyExists)
-        }
-    
-        var svgns = "http://www.w3.org/2000/svg";
-        var popupContainer = document.createElementNS(svgns, 'g');
-        popupContainer.id = "popupContainer"
-       
-        var popup = document.createElementNS(svgns, 'rect');
-        popup.id = 'popup'
-        popup.setAttributeNS(null, 'x', adjustedPostion.x);
-        popup.setAttributeNS(null, 'y', adjustedPostion.y);
-        popup.setAttributeNS(null, 'height', popupHeight);
-        popup.setAttributeNS(null, 'width', popupWidth);
-        popup.style = 'fill: rgb(255,255,255,);'
-        popupContainer.appendChild(popup)
-
-        var popupBillImage = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-        popupBillImage.id = `popupBillImage`
-        popupBillImage.setAttributeNS(null, 'x', adjustedPostion.x);
-        popupBillImage.setAttributeNS(null, 'y', adjustedPostion.y);
-        popupBillImage.setAttributeNS(null, 'height', popupHeight);
-        popupBillImage.setAttributeNS(null, 'width', popupWidth/2);
-        popupBillImage.setAttributeNS(null, 'href', `data/images/${clickedImage.id}.jpg`);
-        popupContainer.appendChild(popupBillImage);
-      
-        fetch(`data/drawing_instructions/${clickedImage.id}.txt`)
-        .then((res) => res.text())
-        .then((text) => {
-          function parseCommand(){
+        billCoordinates = getBillCoordinates()
+        position = getPopUpOrientation(clickedImage, billCoordinates)
+        if (position != -1){
+          centerPos = calculateCenterOfBox(clickedImage.id)
+          adjustedPostion = adjustXYPos(centerPos, position)
+        
           
-            if ( i < commands.length - 1){
-              command = commands[i]
-              if (command.length > 0){
-                parts = commands[i].split(".")
-                
-                if (parts[0] == 'c'){
-                  color = rgbToHex(parts[1], parts[2], parts[3])
-                }
+          var alreadyExists = document.getElementById('popupContainer');
 
-                else{
-                  if (parts[0] == 's'){
-                    thickness= parts[1] * 0.85*0.5
+          if (alreadyExists){
+            var parent = alreadyExists.parentNode
+            parent.removeChild(alreadyExists)
+          }
+      
+          var svgns = "http://www.w3.org/2000/svg";
+          var popupContainer = document.createElementNS(svgns, 'g');
+          popupContainer.id = "popupContainer"
+          
+          
+          var popup = document.createElementNS(svgns, 'rect');
+          popup.id = 'popup'
+          popup.setAttributeNS(null, 'x', adjustedPostion.x);
+          popup.setAttributeNS(null, 'y', adjustedPostion.y);
+          popup.setAttributeNS(null, 'height', popupHeight);
+          popup.setAttributeNS(null, 'width', popupWidth);
+          popup.style = 'fill: rgb(255,255,255,1);'
+          popupContainer.appendChild(popup)
+
+          var popupBillImage = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+          popupBillImage.id = `popupBillImage`
+          popupBillImage.setAttributeNS(null, 'x', adjustedPostion.x);
+          popupBillImage.setAttributeNS(null, 'y', adjustedPostion.y);
+          popupBillImage.setAttributeNS(null, 'height', popupHeight);
+          popupBillImage.setAttributeNS(null, 'width', popupWidth/2);
+          popupBillImage.setAttributeNS(null, 'href', `data/images/${clickedImage.id}.jpg`);
+          popupContainer.appendChild(popupBillImage);
+        
+          fetch(`data/drawing_instructions/${clickedImage.id}.txt`)
+          .then((res) => res.text())
+          .then((text) => {
+            function parseCommand(){
+            
+              if ( i < commands.length - 1){
+                command = commands[i]
+                if (command.length > 0){
+                  parts = commands[i].split(".")
+                  
+                  if (parts[0] == 'c'){
+                    color = rgbToHex(parts[1], parts[2], parts[3])
                   }
 
-                  else {
-                      thickness = thickness
-                      var newLine = document.createElementNS('http://www.w3.org/2000/svg','line');
-                      newLine.setAttribute('id','line2');
-                      newLine.setAttribute('x1', adjustedPostion.x + popupWidth/2 + (parts[0] * scale));
-                      newLine.setAttribute('y1', adjustedPostion.y + (parts[1] * scale));
-                      newLine.setAttribute('x2', adjustedPostion.x + popupWidth/2 + (parts[2] * scale));
-                      newLine.setAttribute('y2', adjustedPostion.y + (parts[3] * scale));
-                      newLine.setAttribute("stroke", color)
-                      newLine.setAttribute("stroke-width", 14)
-                      popupContainer.append(newLine);
+                  else{
+                    if (parts[0] == 's'){
+                      thickness= parts[1] / 0.85 * scale
+                    }
+
+                    else {
+                        thickness = thickness
+                        var newLine = document.createElementNS('http://www.w3.org/2000/svg','line');
+                        
+                        newLine.setAttribute('x1', adjustedPostion.x + popupWidth/2 + (parts[0] * scale));
+                        newLine.setAttribute('y1', adjustedPostion.y + (parts[1] * scale));
+                        newLine.setAttribute('x2', adjustedPostion.x + popupWidth/2 + (parts[2]) * scale );
+                        newLine.setAttribute('y2', adjustedPostion.y + parts[3] * scale);
+                        newLine.setAttribute('stroke-linecap', "round");
+
+                        newLine.style = ` stroke:${color}; stroke-width: ${thickness}; `
+                        popupContainer.append(newLine);
+                    }
                   }
                 }
               }
-            }
-            i++
-            setTimeout(parseCommand, 10)
-            }
+              i++
+              setTimeout(parseCommand, 10)            }
 
-          // do something with "text"
-          commands = text.split("drawing=")[1]
+            // do something with "text"
+            commands = text.split("drawing=")[1]
 
-          curCommand = 0;
-          thickness = 1;
-          color = 'black';
-          scale = 0.5
-          commands = commands.split("_");
-          numCommands = commands.length;
-          
-          var i = 0;
+            curCommand = 0;
+            thickness = 1;
+            color = 'black';
+            scale = 0.5
+            commands = commands.split("_");
+            numCommands = commands.length;
+            
+            var i = 0;
 
-          setTimeout(parseCommand,10)  
-        })
-        .catch((e) => console.error(e));
-      
-        document.getElementById('bill').appendChild(popupContainer);
-
+            setTimeout(parseCommand,10)  
+          })
+          .catch((e) => console.error(e));
+        
+          document.getElementById('bill').appendChild(popupContainer);
+        }
       }
 
       setupBillSize()
 
       document.getElementById('bill').addEventListener('click', function (event) {
-        createPopUpBox(event.srcElement)
+      
+        if (event.srcElement.tagName == 'rect'){
+          createPopUpBox(event.srcElement)
+        }
       }, false);
 
       document.getElementById('bill').addEventListener('mouseover', function (event) {
-        xValue = event.srcElement.x.baseVal.value
-        yValue = event.srcElement.y.baseVal.value
+        if (event.srcElement.tagName == 'rect'){
+          xValue = event.srcElement.x.baseVal.value
+          yValue = event.srcElement.y.baseVal.value
 
-        if (xValue > edgeMargin && yValue > edgeMargin){
-          event.srcElement.style="fill: rgb(255,255,255,0); stroke:red; stroke-width:0.5;" 
+          if (xValue > edgeMargin && yValue > edgeMargin){
+            event.srcElement.style="fill: rgb(255,255,255,0); stroke:red; stroke-width:1;" 
+          }
         }
+      
       }, false);
 
       document.getElementById('bill').addEventListener('mouseout', function (event) {
-        //console.log(event.srcElement)
-        xValue = event.srcElement.x.baseVal.value
-        yValue = event.srcElement.y.baseVal.value
+        if (event.srcElement.tagName == 'rect'){
+          xValue = event.srcElement.x.baseVal.value
+          yValue = event.srcElement.y.baseVal.value
 
-        if (xValue > edgeMargin && yValue > edgeMargin){
-          event.srcElement.style="fill: rgb(255,255,255,0)" 
+          if (xValue > edgeMargin && yValue > edgeMargin){
+            event.srcElement.style="fill: rgb(255,255,255,0)" 
+          }
         }
+       
       }, false);
 
     </script>
