@@ -106,30 +106,43 @@
         var idX = ids[0]
         var idY = ids[1]
 
-        centerX = idX * individualImageWidth
-        centerY = idY * individualImageHeight
+        centerX = idX * individualImageWidth + (individualImageWidth/2)
+        centerY = idY * individualImageHeight + (individualImageHeight/2)
 
         return {'x': centerX, 'y': centerY}
       }
 
-      function adjustXYPos(centerPos, position){
+      function adjustXYPos(clickedPosition, position){
         var adjustedX;
         var adjustedY;
+     
         if (position == 'topLeft'){
-          adjustedX = centerPos.x + (individualImageWidth/2)
-          adjustedY = centerPos.y - (individualImageHeight/2)
+          adjustedX = clickedPosition.x - popupWidth/2
+          adjustedY = clickedPosition.y + 15
         }
         else if (position == 'bottomLeft'){
-          adjustedX = centerPos.x + (individualImageWidth/2) 
-          adjustedY = centerPos.y + (individualImageHeight/2) - popupHeight
+          adjustedX = clickedPosition.x - popupWidth/2
+          adjustedY = clickedPosition.y - popupHeight - 15
         }
         else if (position == 'topRight'){
-          adjustedX = centerPos.x - (individualImageWidth/2) - popupWidth
-          adjustedY = centerPos.y - (individualImageHeight/2)
+          adjustedX = clickedPosition.x  - popupWidth/2
+          adjustedY = clickedPosition.y + 15
         }
         else if (position == 'bottomRight'){
-          adjustedX = centerPos.x - (individualImageWidth/2) - popupWidth
-          adjustedY = centerPos.y + (individualImageHeight/2) - popupHeight
+          adjustedX = clickedPosition.x  - popupWidth/2
+          adjustedY = clickedPosition.y  - popupHeight - 15
+        }
+
+        var leftOverhang = clickedPosition.x - popupWidth/2
+        var rightOverhang = clickedPosition.x + popupWidth/2
+
+        if ( leftOverhang < 0){
+          adjustedX = adjustedX + (-1 * leftOverhang)
+        } 
+        if (rightOverhang > billWidth + edgeMargin){
+          console.log("hi")
+          console.log(((billWidth + edgeMargin)-rightOverhang))
+          adjustedX = adjustedX + ((billWidth + edgeMargin*2)-rightOverhang)
         }
         return {'x': adjustedX, 'y': adjustedY}
       }
@@ -161,97 +174,97 @@
 
         billCoordinates = getBillCoordinates()
         position = getPopUpOrientation(clickedImage, billCoordinates)
-        if (position != -1){
-          centerPos = calculateCenterOfBox(clickedImage.id)
-          adjustedPostion = adjustXYPos(centerPos, position)
-        
-          
-          var alreadyExists = document.getElementById('popupContainer');
-
-          if (alreadyExists){
-            var parent = alreadyExists.parentNode
-            parent.removeChild(alreadyExists)
-          }
+        clickedElementPosition = {'x': parseInt(clickedImage.getAttribute('x')), 'y': parseInt(clickedImage.getAttribute('y'))}
+        console.log(clickedElementPosition)
+        adjustedPostion = adjustXYPos(clickedElementPosition, position)
       
-          var svgns = "http://www.w3.org/2000/svg";
-          var popupContainer = document.createElementNS(svgns, 'g');
-          popupContainer.id = "popupContainer"
-          
-          
-          var popup = document.createElementNS(svgns, 'rect');
-          popup.id = 'popup'
-          popup.setAttributeNS(null, 'x', adjustedPostion.x);
-          popup.setAttributeNS(null, 'y', adjustedPostion.y);
-          popup.setAttributeNS(null, 'height', popupHeight);
-          popup.setAttributeNS(null, 'width', popupWidth);
-          popup.style = 'fill: rgb(255,255,255,1);'
-          popupContainer.appendChild(popup)
+        console.log(adjustedPostion)
+        var alreadyExists = document.getElementById('popupContainer');
 
-          var popupBillImage = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-          popupBillImage.id = `popupBillImage`
-          popupBillImage.setAttributeNS(null, 'x', adjustedPostion.x);
-          popupBillImage.setAttributeNS(null, 'y', adjustedPostion.y);
-          popupBillImage.setAttributeNS(null, 'height', popupHeight);
-          popupBillImage.setAttributeNS(null, 'width', popupWidth/2);
-          popupBillImage.setAttributeNS(null, 'href', `data/images/${clickedImage.id}.jpg`);
-          popupContainer.appendChild(popupBillImage);
+        if (alreadyExists){
+          var parent = alreadyExists.parentNode
+          parent.removeChild(alreadyExists)
+        }
+    
+        var svgns = "http://www.w3.org/2000/svg";
+        var popupContainer = document.createElementNS(svgns, 'g');
+        popupContainer.id = "popupContainer"
         
-          fetch(`data/drawing_instructions/${clickedImage.id}.txt`)
-          .then((res) => res.text())
-          .then((text) => {
-            function parseCommand(){
-            
-              if ( i < commands.length - 1){
-                command = commands[i]
-                if (command.length > 0){
-                  parts = commands[i].split(".")
-                  
-                  if (parts[0] == 'c'){
-                    color = rgbToHex(parts[1], parts[2], parts[3])
+        
+        var popup = document.createElementNS(svgns, 'rect');
+        popup.id = 'popup'
+        popup.setAttributeNS(null, 'x', adjustedPostion.x);
+        popup.setAttributeNS(null, 'y', adjustedPostion.y);
+        popup.setAttributeNS(null, 'height', popupHeight);
+        popup.setAttributeNS(null, 'width', popupWidth);
+        popup.style = 'fill: rgb(255,255,255,1);'
+        popupContainer.appendChild(popup)
+
+        var popupBillImage = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+        popupBillImage.id = `popupBillImage`
+        popupBillImage.setAttributeNS(null, 'x', adjustedPostion.x);
+        popupBillImage.setAttributeNS(null, 'y', adjustedPostion.y);
+        popupBillImage.setAttributeNS(null, 'height', popupHeight);
+        popupBillImage.setAttributeNS(null, 'width', popupWidth/2);
+        popupBillImage.setAttributeNS(null, 'href', `data/images/${clickedImage.id}.jpg`);
+        popupContainer.appendChild(popupBillImage);
+      
+        fetch(`data/drawing_instructions/${clickedImage.id}.txt`)
+        .then((res) => res.text())
+        .then((text) => {
+          function parseCommand(){
+          
+            if ( i < commands.length - 1){
+              command = commands[i]
+              if (command.length > 0){
+                parts = commands[i].split(".")
+                
+                if (parts[0] == 'c'){
+                  color = rgbToHex(parts[1], parts[2], parts[3])
+                }
+
+                else{
+                  if (parts[0] == 's'){
+                    thickness= parts[1] / 0.85 * scale
                   }
 
-                  else{
-                    if (parts[0] == 's'){
-                      thickness= parts[1] / 0.85 * scale
-                    }
+                  else {
+                      thickness = thickness
+                      var newLine = document.createElementNS('http://www.w3.org/2000/svg','line');
+                      
+                      newLine.setAttribute('x1', adjustedPostion.x + popupWidth/2 + (parts[0] * scale));
+                      newLine.setAttribute('y1', adjustedPostion.y + (parts[1] * scale));
+                      newLine.setAttribute('x2', adjustedPostion.x + popupWidth/2 + (parts[2]) * scale );
+                      newLine.setAttribute('y2', adjustedPostion.y + parts[3] * scale);
+                      newLine.setAttribute('stroke-linecap', "round");
 
-                    else {
-                        thickness = thickness
-                        var newLine = document.createElementNS('http://www.w3.org/2000/svg','line');
-                        
-                        newLine.setAttribute('x1', adjustedPostion.x + popupWidth/2 + (parts[0] * scale));
-                        newLine.setAttribute('y1', adjustedPostion.y + (parts[1] * scale));
-                        newLine.setAttribute('x2', adjustedPostion.x + popupWidth/2 + (parts[2]) * scale );
-                        newLine.setAttribute('y2', adjustedPostion.y + parts[3] * scale);
-                        newLine.setAttribute('stroke-linecap', "round");
-
-                        newLine.style = ` stroke:${color}; stroke-width: ${thickness}; `
-                        popupContainer.append(newLine);
-                    }
+                      newLine.style = ` stroke:${color}; stroke-width: ${thickness}; `
+                      popupContainer.append(newLine);
                   }
                 }
               }
-              i++
-              setTimeout(parseCommand, 10)            }
+            }
+            i++
+            setTimeout(parseCommand, 10)            }
 
-            // do something with "text"
-            commands = text.split("drawing=")[1]
+          // do something with "text"
+          commands = text.split("drawing=")[1]
 
-            curCommand = 0;
-            thickness = 1;
-            color = 'black';
-            scale = 0.5
-            commands = commands.split("_");
-            numCommands = commands.length;
-            
-            var i = 0;
+          curCommand = 0;
+          thickness = 1;
+          color = 'black';
+          scale = 0.5
+          commands = commands.split("_");
+          numCommands = commands.length;
+          
+          var i = 0;
 
-            setTimeout(parseCommand,10)  
-          })
-          .catch((e) => console.error(e));
-        
-          document.getElementById('bill').appendChild(popupContainer);
-        }
+          setTimeout(parseCommand,10)  
+        })
+        .catch((e) => console.error(e));
+      
+        document.getElementById('bill').appendChild(popupContainer);
+      
       }
 
       setupBillSize()
@@ -289,5 +302,15 @@
 
     </script>
 	  <script src="index.js"></script>
+    <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
   </body>
 </html>
