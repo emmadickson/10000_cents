@@ -63,6 +63,7 @@
               
                 var rect = document.createElementNS(svgns, 'rect');
                 rect.id = `${j}.${i}`
+                rect.class = "cell"
                 rect.setAttributeNS(null, 'x', x);
                 rect.setAttributeNS(null, 'y', y);
                 rect.setAttributeNS(null, 'height', individualImageHeight);
@@ -245,7 +246,7 @@
               }
             }
             i++
-            setTimeout(parseCommand, 10)            }
+            setTimeout(parseCommand, 6)            }
 
           // do something with "text"
           commands = text.split("drawing=")[1]
@@ -259,7 +260,7 @@
           
           var i = 0;
 
-          setTimeout(parseCommand,10)  
+          setTimeout(parseCommand,6)  
         })
         .catch((e) => console.error(e));
       
@@ -277,7 +278,8 @@
       }, false);
 
       document.getElementById('bill').addEventListener('mouseover', function (event) {
-        if (event.srcElement.tagName == 'rect'){
+        console.log(event.srcElement)
+        if (event.srcElement.tagName == 'rect' && event.srcElement.class == 'cell'){
           xValue = event.srcElement.x.baseVal.value
           yValue = event.srcElement.y.baseVal.value
 
@@ -289,7 +291,8 @@
       }, false);
 
       document.getElementById('bill').addEventListener('mouseout', function (event) {
-        if (event.srcElement.tagName == 'rect'){
+        console.log(event.srcElement.class)
+        if (event.srcElement.tagName == 'rect' && event.srcElement.class == 'cell'){
           xValue = event.srcElement.x.baseVal.value
           yValue = event.srcElement.y.baseVal.value
 
