@@ -54,7 +54,7 @@
       var popupSideHeight = 84
       var popupSideWidth = 200
       var popupSideMargin = 2
-
+      var timeout;
       var svgns = "http://www.w3.org/2000/svg";
 
       function setupBillSize(){
@@ -129,19 +129,19 @@
         var adjustedY;
      
         if (position == 'topLeft'){
-          adjustedX = clickedPosition.x - popupWidth/2
+          adjustedX = clickedPosition.x - popupWidth/2 + individualImageWidth
           adjustedY = clickedPosition.y + 10
         }
         else if (position == 'bottomLeft'){
-          adjustedX = clickedPosition.x - popupWidth/2
+          adjustedX = clickedPosition.x - popupWidth/2 + individualImageWidth
           adjustedY = clickedPosition.y - popupHeight - 10
         }
         else if (position == 'topRight'){
-          adjustedX = clickedPosition.x  - popupWidth/2
+          adjustedX = clickedPosition.x  - popupWidth/2 + individualImageWidth
           adjustedY = clickedPosition.y + 10
         }
         else if (position == 'bottomRight'){
-          adjustedX = clickedPosition.x  - popupWidth/2
+          adjustedX = clickedPosition.x  - popupWidth/2 + individualImageWidth
           adjustedY = clickedPosition.y  - popupHeight - 10
         }
 
@@ -180,8 +180,9 @@
       }
 
       function createPopUpBox(clickedImage){
+        console.log('clicking a pop up')
+        clearInterval(timeout)
         event.srcElement.style="fill: red; stroke:red; stroke-width:1;" 
-
         billCoordinates = getBillCoordinates()
         position = getPopUpOrientation(clickedImage, billCoordinates)
         clickedElementPosition = {'x': parseInt(clickedImage.getAttribute('x')), 'y': parseInt(clickedImage.getAttribute('y'))}
@@ -242,8 +243,12 @@
         fetch(`data/drawing_instructions/${clickedImage.id}.txt`)
         .then((res) => res.text())
         .then((text) => {
-          function parseCommand(){
+          function parseCommand(i) {
+           
+            console.log(`distinct ${i} ${commands.length} ${i < commands.length - 1}`)
+         
             if ( i < commands.length - 1){
+
               command = commands[i]
               if (command.length > 0){
                 parts = commands[i].split(".")
@@ -266,31 +271,33 @@
                       newLine.setAttribute('x2',  (parts[2]) * scale );
                       newLine.setAttribute('y2',(parts[3] * scale));
                       newLine.setAttribute('stroke-linecap', "round");
-
                       newLine.style = ` stroke:${color}; stroke-width: ${thickness}; `
-
-                      document.getElementById('drawingContainer').append(newLine);
+                     
+                      var container = document.getElementById('drawingContainer')
+                      container.appendChild(newLine)
+                      
                   }
                 }
               }
             }
             i++
-            setTimeout(parseCommand, 6)            }
+            timeout = setTimeout(function () {
+                parseCommand(i);
+            }, 6);
+          }
           
           
           // do something with "text"
           commands = text.split("drawing=")[1]
-
           curCommand = 0;
           thickness = 1;
           color = 'black';
           scale = 0.5
           commands = commands.split("_");
           numCommands = commands.length;
-          
           var i = 0;
 
-          setTimeout(parseCommand,6)  
+          parseCommand(i)
         })
         .catch((e) => console.error(e));
       
@@ -301,8 +308,13 @@
       setupBillSize()
 
       document.getElementById('bill').addEventListener('click', function (event) {
-      
         if (event.srcElement.tagName == 'rect'){
+          if (document.getElementById('popupContainer') != null ){
+            var alreadyExists = document.getElementById('popupContainer');
+            var parent = alreadyExists.parentNode
+            parent.removeChild(alreadyExists)
+           }
+           clearInterval(timeout)
           createPopUpBox(event.srcElement)
         }
       }, false);
@@ -329,15 +341,12 @@
           }
           
           var popupContainer = document.getElementById('popupContainer')
-          //TODO: if drawing is true kill the popup and drawing instructions
-
-          if (popupContainer.drawing == true){
-   
-            var alreadyExists = document.getElementById('popupContainer');
-
-              var parent = alreadyExists.parentNode
-              parent.removeChild(alreadyExists)
          
+          if (popupContainer != null ){
+            var alreadyExists = document.getElementById('popupContainer');
+            var parent = alreadyExists.parentNode
+            parent.removeChild(alreadyExists)
+            clearInterval(timeout)
            }
         }
        
