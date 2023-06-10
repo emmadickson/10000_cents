@@ -185,13 +185,6 @@
         position = getPopUpOrientation(clickedImage, billCoordinates)
         clickedElementPosition = {'x': parseInt(clickedImage.getAttribute('x')), 'y': parseInt(clickedImage.getAttribute('y'))}
         adjustedPostion = adjustXYPos(clickedElementPosition, position)
-      
-        var alreadyExists = document.getElementById('popupContainer');
-
-        if (alreadyExists){
-          var parent = alreadyExists.parentNode
-          parent.removeChild(alreadyExists)
-        }
     
         var svgns = "http://www.w3.org/2000/svg";
         var popupContainer = document.createElementNS(svgns, 'g');
@@ -243,11 +236,12 @@
 
         popupRightSide.append(background)
 
+        popupContainer.drawing = true
+
         fetch(`data/drawing_instructions/${clickedImage.id}.txt`)
         .then((res) => res.text())
         .then((text) => {
           function parseCommand(){
-            
             if ( i < commands.length - 1){
               command = commands[i]
               if (command.length > 0){
@@ -328,12 +322,22 @@
         if (event.srcElement.tagName == 'rect' && event.srcElement.class == 'cell'){
           xValue = event.srcElement.x.baseVal.value
           yValue = event.srcElement.y.baseVal.value
-          console.log("mouseout")
-          //TODO: if drawing is true kill the popup and drawing instructions
-          console.log(event.srcElement)
+         
           if (xValue > edgeMargin && yValue > edgeMargin){
             event.srcElement.style="fill: rgb(255,255,255,0)" 
           }
+          
+          var popupContainer = document.getElementById('popupContainer')
+          //TODO: if drawing is true kill the popup and drawing instructions
+
+          if (popupContainer.drawing == true){
+   
+            var alreadyExists = document.getElementById('popupContainer');
+
+              var parent = alreadyExists.parentNode
+              parent.removeChild(alreadyExists)
+         
+           }
         }
        
       }, false);
