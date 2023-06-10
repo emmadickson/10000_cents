@@ -12,6 +12,7 @@
         width:100%;
         display: flex;
         justify-content: center;
+        cursor: none;
       }
       #drawingContainer{
         width:200px;
@@ -129,19 +130,19 @@
      
         if (position == 'topLeft'){
           adjustedX = clickedPosition.x - popupWidth/2
-          adjustedY = clickedPosition.y + 5
+          adjustedY = clickedPosition.y + 10
         }
         else if (position == 'bottomLeft'){
           adjustedX = clickedPosition.x - popupWidth/2
-          adjustedY = clickedPosition.y - popupHeight - 5
+          adjustedY = clickedPosition.y - popupHeight - 10
         }
         else if (position == 'topRight'){
           adjustedX = clickedPosition.x  - popupWidth/2
-          adjustedY = clickedPosition.y + 5
+          adjustedY = clickedPosition.y + 10
         }
         else if (position == 'bottomRight'){
           adjustedX = clickedPosition.x  - popupWidth/2
-          adjustedY = clickedPosition.y  - popupHeight - 5
+          adjustedY = clickedPosition.y  - popupHeight - 10
         }
 
         var leftOverhang = clickedPosition.x - popupWidth/2
