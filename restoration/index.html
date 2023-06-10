@@ -13,6 +13,10 @@
         display: flex;
         justify-content: center;
       }
+      #drawingContainer{
+        width:200px;
+        height:85px;
+      }
     </style>
   </head>
   <body>
@@ -21,6 +25,7 @@
      
    
       <svg id="bill">
+
         <g  id="videoContainer">
           <foreignobject  id="billForeignObject" x="0" y="0" width="800" height="340">
             <video width="800" height="340" autoplay="true" muted="true" >
@@ -28,7 +33,10 @@
             </video>
           </foreignobject>
         </g>
-        <g  id="billContainer"></g>
+        <g  id="billContainer">
+        </g>
+       
+
       </svg> 
 
     </div>
@@ -42,6 +50,10 @@
       var popupHeight = 90;
       var popupWidth = 400;
       var edgeMargin = 50;
+      var popupSideHeight = 84
+      var popupSideWidth = 200
+      var popupSideMargin = 2
+
       var svgns = "http://www.w3.org/2000/svg";
 
       function setupBillSize(){
@@ -83,8 +95,7 @@
         var midXPoint = (billCoordinates.x2-billCoordinates.x1)/2
         var midYPoint = (billCoordinates.y2-billCoordinates.y1)/2
         var position;
-        console.log(midXPoint)
-        console.log(midYPoint)
+      
         if (clickedImageXPos > midXPoint && clickedImageYPos < midYPoint){
           position = 'topRight'
         }
@@ -97,7 +108,6 @@
         else if (clickedImageXPos < midXPoint && clickedImageYPos > midYPoint){
           position = 'bottomLeft'
         }
-        console.log(position)
         return position
     
       }
@@ -119,19 +129,19 @@
      
         if (position == 'topLeft'){
           adjustedX = clickedPosition.x - popupWidth/2
-          adjustedY = clickedPosition.y + 15
+          adjustedY = clickedPosition.y + 5
         }
         else if (position == 'bottomLeft'){
           adjustedX = clickedPosition.x - popupWidth/2
-          adjustedY = clickedPosition.y - popupHeight - 15
+          adjustedY = clickedPosition.y - popupHeight - 5
         }
         else if (position == 'topRight'){
           adjustedX = clickedPosition.x  - popupWidth/2
-          adjustedY = clickedPosition.y + 15
+          adjustedY = clickedPosition.y + 5
         }
         else if (position == 'bottomRight'){
           adjustedX = clickedPosition.x  - popupWidth/2
-          adjustedY = clickedPosition.y  - popupHeight - 15
+          adjustedY = clickedPosition.y  - popupHeight - 5
         }
 
         var leftOverhang = clickedPosition.x - popupWidth/2
@@ -141,8 +151,6 @@
           adjustedX = adjustedX + (-1 * leftOverhang)
         } 
         if (rightOverhang > billWidth + edgeMargin){
-          console.log("hi")
-          console.log(((billWidth + edgeMargin)-rightOverhang))
           adjustedX = adjustedX + ((billWidth + edgeMargin*2)-rightOverhang)
         }
         return {'x': adjustedX, 'y': adjustedY}
@@ -176,10 +184,8 @@
         billCoordinates = getBillCoordinates()
         position = getPopUpOrientation(clickedImage, billCoordinates)
         clickedElementPosition = {'x': parseInt(clickedImage.getAttribute('x')), 'y': parseInt(clickedImage.getAttribute('y'))}
-        console.log(clickedElementPosition)
         adjustedPostion = adjustXYPos(clickedElementPosition, position)
       
-        console.log(adjustedPostion)
         var alreadyExists = document.getElementById('popupContainer');
 
         if (alreadyExists){
@@ -190,7 +196,7 @@
         var svgns = "http://www.w3.org/2000/svg";
         var popupContainer = document.createElementNS(svgns, 'g');
         popupContainer.id = "popupContainer"
-        
+        popupContainer.style = 'fill: rgb(255,255,255,1);'
         
         var popup = document.createElementNS(svgns, 'rect');
         popup.id = 'popup'
@@ -201,20 +207,47 @@
         popup.style = 'fill: rgb(255,255,255,1);'
         popupContainer.appendChild(popup)
 
-        var popupBillImage = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-        popupBillImage.id = `popupBillImage`
-        popupBillImage.setAttributeNS(null, 'x', adjustedPostion.x);
-        popupBillImage.setAttributeNS(null, 'y', adjustedPostion.y);
-        popupBillImage.setAttributeNS(null, 'height', popupHeight);
-        popupBillImage.setAttributeNS(null, 'width', popupWidth/2);
-        popupBillImage.setAttributeNS(null, 'href', `data/images/${clickedImage.id}.jpg`);
-        popupContainer.appendChild(popupBillImage);
-      
+        var popupInnerBox = document.createElementNS(svgns, 'rect');
+        popupInnerBox.id = 'popupInnerBox'
+        popupInnerBox.setAttributeNS(null, 'x', adjustedPostion.x+popupSideMargin);
+        popupInnerBox.setAttributeNS(null, 'y', adjustedPostion.y+popupSideMargin);
+        popupInnerBox.setAttributeNS(null, 'height', popupHeight-(popupSideMargin*2));
+        popupInnerBox.setAttributeNS(null, 'width', popupWidth-(popupSideMargin*2));
+        popupInnerBox.style = ' fill: grey;'
+        popupContainer.appendChild(popupInnerBox)
+
+        var popupLeftSide = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+        popupLeftSide.id = `popupLeftSide`
+        popupLeftSide.setAttributeNS(null, 'x', adjustedPostion.x+popupSideMargin);
+        popupLeftSide.setAttributeNS(null, 'y', adjustedPostion.y+popupSideMargin+1);
+        popupLeftSide.setAttributeNS(null, 'height', popupSideHeight);
+        popupLeftSide.setAttributeNS(null, 'width', popupSideWidth);
+        popupLeftSide.setAttributeNS(null, 'href', `data/images/${clickedImage.id}.jpg`);
+        popupContainer.appendChild(popupLeftSide);
+        
+        var popupRightSide = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        popupRightSide.id = 'drawingContainer'
+        popupRightSide.setAttributeNS(null, 'x', (adjustedPostion.x+popupSideMargin + popupSideWidth) - popupSideMargin*2 -1);
+        popupRightSide.setAttributeNS(null, 'y', adjustedPostion.y+popupSideMargin+1);
+        popupRightSide.setAttributeNS(null, 'height', popupSideHeight);
+        popupRightSide.setAttributeNS(null, 'width', popupSideWidth);
+        popupRightSide.setAttributeNS(null, 'href', `data/images/${clickedImage.id}.jpg`);
+        popupContainer.appendChild(popupRightSide);
+
+        var background = document.createElementNS(svgns, 'rect');
+        background.setAttributeNS(null, 'x',0);
+        background.setAttributeNS(null, 'y', 0);
+        background.setAttributeNS(null, 'height', popupSideHeight);
+        background.setAttributeNS(null, 'width', popupSideWidth);
+        background.style = ' fill: white;'
+
+        popupRightSide.append(background)
+
         fetch(`data/drawing_instructions/${clickedImage.id}.txt`)
         .then((res) => res.text())
         .then((text) => {
           function parseCommand(){
-          
+            
             if ( i < commands.length - 1){
               command = commands[i]
               if (command.length > 0){
@@ -226,28 +259,30 @@
 
                 else{
                   if (parts[0] == 's'){
-                    thickness= parts[1] / 0.85 * scale
+                    thickness= (parts[1] / 0.85) * scale
                   }
 
                   else {
                       thickness = thickness
                       var newLine = document.createElementNS('http://www.w3.org/2000/svg','line');
                       
-                      newLine.setAttribute('x1', adjustedPostion.x + popupWidth/2 + (parts[0] * scale));
-                      newLine.setAttribute('y1', adjustedPostion.y + (parts[1] * scale));
-                      newLine.setAttribute('x2', adjustedPostion.x + popupWidth/2 + (parts[2]) * scale );
-                      newLine.setAttribute('y2', adjustedPostion.y + parts[3] * scale);
+                      newLine.setAttribute('x1', parts[0] * scale);
+                      newLine.setAttribute('y1', parts[1] * scale);
+                      newLine.setAttribute('x2',  (parts[2]) * scale );
+                      newLine.setAttribute('y2',(parts[3] * scale));
                       newLine.setAttribute('stroke-linecap', "round");
 
                       newLine.style = ` stroke:${color}; stroke-width: ${thickness}; `
-                      popupContainer.append(newLine);
+
+                      document.getElementById('drawingContainer').append(newLine);
                   }
                 }
               }
             }
             i++
             setTimeout(parseCommand, 6)            }
-
+          
+          
           // do something with "text"
           commands = text.split("drawing=")[1]
 
@@ -278,7 +313,6 @@
       }, false);
 
       document.getElementById('bill').addEventListener('mouseover', function (event) {
-        console.log(event.srcElement)
         if (event.srcElement.tagName == 'rect' && event.srcElement.class == 'cell'){
           xValue = event.srcElement.x.baseVal.value
           yValue = event.srcElement.y.baseVal.value
@@ -291,11 +325,12 @@
       }, false);
 
       document.getElementById('bill').addEventListener('mouseout', function (event) {
-        console.log(event.srcElement.class)
         if (event.srcElement.tagName == 'rect' && event.srcElement.class == 'cell'){
           xValue = event.srcElement.x.baseVal.value
           yValue = event.srcElement.y.baseVal.value
-
+          console.log("mouseout")
+          //TODO: if drawing is true kill the popup and drawing instructions
+          console.log(event.srcElement)
           if (xValue > edgeMargin && yValue > edgeMargin){
             event.srcElement.style="fill: rgb(255,255,255,0)" 
           }
