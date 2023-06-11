@@ -17,3 +17,6 @@ This is the code provided at the beginning of the restoration
 ### Documentation
 
 This contains the Condition Assessment and the Pre Treatment report written before beginning the restoration.
+
+## Running the Piece
+Simply go to the restoration folder and run ```python3 -m http.server 9000``` then navigate to localhost:9000
