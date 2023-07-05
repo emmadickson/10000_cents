@@ -26,7 +26,18 @@
      
    
       <svg id="bill">
-
+        <defs>
+          <filter id="red-glow" x="-5000%" y="-5000%" width="10000%" height="10000%">
+            <feFlood result="flood" flood-color="#FC0002" flood-opacity="1"></feFlood>
+            <feComposite in="flood" result="mask" in2="SourceGraphic" operator="in"></feComposite>
+            <feMorphology in="mask" result="dilated" operator="dilate" radius="2"></feMorphology>
+            <feGaussianBlur in="dilated" result="blurred" stdDeviation="5"></feGaussianBlur>
+            <feMerge>
+                <feMergeNode in="blurred"></feMergeNode>
+                <feMergeNode in="SourceGraphic"></feMergeNode>
+            </feMerge>
+        </filter>
+        </defs>
         <g  id="videoContainer">
           <foreignobject  id="billForeignObject" x="0" y="0" width="800" height="340">
             <video width="800" height="340" autoplay="true" muted="true" >
@@ -44,7 +55,7 @@
    
     <script>
      
-      var individualImageWidth = 8;
+      var individualImageWidth = 8.1;
       var individualImageHeight = 3.4;
       var billHeight =individualImageHeight * 100; 
       var billWidth = individualImageWidth * 100;
@@ -67,10 +78,10 @@
         billLoadForeignObject.setAttribute('x', edgeMargin)
         billLoadForeignObject.setAttribute('y', edgeMargin)
 
-        y = edgeMargin;
+        y = edgeMargin + individualImageHeight/2
       
         for (var i = 1; i < 100; i++){
-            x = edgeMargin; 
+            x = edgeMargin + individualImageWidth/2
           
             for (var j = 1; j < 100; j++){
               
@@ -130,29 +141,34 @@
      
         if (position == 'topLeft'){
           adjustedX = clickedPosition.x - popupWidth/2 + individualImageWidth
-          adjustedY = clickedPosition.y + 10
+          adjustedY = clickedPosition.y + 15
         }
         else if (position == 'bottomLeft'){
           adjustedX = clickedPosition.x - popupWidth/2 + individualImageWidth
-          adjustedY = clickedPosition.y - popupHeight - 10
+          adjustedY = clickedPosition.y - popupHeight - 15
         }
         else if (position == 'topRight'){
           adjustedX = clickedPosition.x  - popupWidth/2 + individualImageWidth
-          adjustedY = clickedPosition.y + 10
+          adjustedY = clickedPosition.y + 15
         }
         else if (position == 'bottomRight'){
           adjustedX = clickedPosition.x  - popupWidth/2 + individualImageWidth
-          adjustedY = clickedPosition.y  - popupHeight - 10
+          adjustedY = clickedPosition.y  - popupHeight - 15
         }
 
         var leftOverhang = clickedPosition.x - popupWidth/2
-        var rightOverhang = clickedPosition.x + popupWidth/2
 
+
+        var rightOverhang =  (billWidth + edgeMargin) - ( clickedPosition.x + popupWidth/2 - edgeMargin/2)
         if ( leftOverhang < 0){
           adjustedX = adjustedX + (-1 * leftOverhang)
         } 
-        if (rightOverhang > billWidth + edgeMargin){
-          adjustedX = adjustedX + ((billWidth + edgeMargin*2)-rightOverhang)
+        if (rightOverhang < 0){
+          console.log("right overhang calculated")
+          console.log(adjustedX)
+
+          adjustedX = adjustedX  + rightOverhang 
+          console.log(adjustedX)
         }
         return {'x': adjustedX, 'y': adjustedY}
       }
@@ -180,14 +196,13 @@
       }
 
       function createPopUpBox(clickedImage){
-        console.log('clicking a pop up')
         clearInterval(timeout)
-        event.srcElement.style="fill: red; stroke:red; stroke-width:1;" 
+        event.srcElement.style="fill:red; stroke:red; stroke-width:1; filter:url(#red-glow)"
         billCoordinates = getBillCoordinates()
         position = getPopUpOrientation(clickedImage, billCoordinates)
         clickedElementPosition = {'x': parseInt(clickedImage.getAttribute('x')), 'y': parseInt(clickedImage.getAttribute('y'))}
         adjustedPostion = adjustXYPos(clickedElementPosition, position)
-    
+        
         var svgns = "http://www.w3.org/2000/svg";
         var popupContainer = document.createElementNS(svgns, 'g');
         popupContainer.id = "popupContainer"
@@ -201,6 +216,17 @@
         popup.setAttributeNS(null, 'width', popupWidth);
         popup.style = 'fill: rgb(255,255,255,1);'
         popupContainer.appendChild(popup)
+
+        var pointer = document.createElementNS(svgns, 'polygon');
+        pointer.id = 'pointer'
+        pointer.style.fill = "white"
+        if (position.includes('top')){
+          pointer.setAttribute('points', `${clickedElementPosition.x } ${adjustedPostion.y-10}, ${clickedElementPosition.x + individualImageWidth/2 } ${adjustedPostion.y}, ${clickedElementPosition.x + individualImageWidth} ${adjustedPostion.y-10}`)
+        }
+        else{
+          pointer.setAttribute('points', `${clickedElementPosition.x } ${clickedElementPosition.y-individualImageHeight}, ${clickedElementPosition.x + individualImageWidth/2 } ${clickedElementPosition.y-individualImageHeight - 10}, ${clickedElementPosition.x + individualImageWidth} ${clickedElementPosition.y - individualImageHeight}`)
+        }
+        document.getElementById('billContainer').appendChild(pointer)
 
         var popupInnerBox = document.createElementNS(svgns, 'rect');
         popupInnerBox.id = 'popupInnerBox'
@@ -245,7 +271,6 @@
         .then((text) => {
           function parseCommand(i) {
            
-            console.log(`distinct ${i} ${commands.length} ${i < commands.length - 1}`)
          
             if ( i < commands.length - 1){
 
@@ -308,11 +333,15 @@
       setupBillSize()
 
       document.getElementById('bill').addEventListener('click', function (event) {
-        if (event.srcElement.tagName == 'rect'){
+     
+       if (event.srcElement.tagName == 'rect'){
           if (document.getElementById('popupContainer') != null ){
             var alreadyExists = document.getElementById('popupContainer');
             var parent = alreadyExists.parentNode
             parent.removeChild(alreadyExists)
+            var pointer = document.getElementById('pointer');
+            var pointerParent = pointer.parentNode
+            pointerParent.removeChild(pointer)
            }
            clearInterval(timeout)
           createPopUpBox(event.srcElement)
@@ -346,6 +375,9 @@
             var alreadyExists = document.getElementById('popupContainer');
             var parent = alreadyExists.parentNode
             parent.removeChild(alreadyExists)
+            var pointer = document.getElementById('pointer');
+            var pointerParent = pointer.parentNode
+            pointerParent.removeChild(pointer)
             clearInterval(timeout)
            }
         }
