@@ -4,25 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>10000 Cents</title>
+    <link rel="stylesheet" href="./assets/css/styles.css">
+
     <style>
-      body{
-        background-color: rgb(248,248,248);
-      }
-      #bill_container{
-        width:100%;
-        display: flex;
-        justify-content: center;
-        cursor: none;
-      }
-      #drawingContainer{
-        width:200px;
-        height:85px;
-      }
-      #bill{
-        padding-top: 25px;
-      }
+        body{
+          background-color: rgb(248,248,248);
+        }
+        #bill_container{
+          width:100%;
+          display: flex;
+          justify-content: center;
+          cursor: none;
+        }
+        #drawingContainer{
+          width:200px;
+          height:85px;
+        }
+        #bill{
+          padding-top: 50px;
+        }
     </style>
-  </head>
+    </head>
   <body>
     <div id="bill_container">
 
@@ -30,11 +32,11 @@
    
       <svg id="bill">
         <defs>
-          <filter id="red-glow" x="-5000%" y="-5000%" width="10000%" height="10000%">
+          <filter id="red-glow" x="-250%" y="-250%" width="500%" height="500%">
             <feFlood result="flood" flood-color="#FC0002" flood-opacity="1"></feFlood>
             <feComposite in="flood" result="mask" in2="SourceGraphic" operator="in"></feComposite>
-            <feMorphology in="mask" result="dilated" operator="dilate" radius="2"></feMorphology>
-            <feGaussianBlur in="dilated" result="blurred" stdDeviation="5"></feGaussianBlur>
+            <feMorphology in="mask" result="dilated" operator="dilate" radius="1"></feMorphology>
+            <feGaussianBlur in="dilated" result="blurred" stdDeviation="3"></feGaussianBlur>
             <feMerge>
                 <feMergeNode in="blurred"></feMergeNode>
                 <feMergeNode in="SourceGraphic"></feMergeNode>
@@ -44,7 +46,7 @@
         <g  id="videoContainer">
           <foreignobject  id="billForeignObject" x="0" y="0" width="800" height="340">
             <video width="800" height="340" autoplay="true" muted="true" >
-              <source src="data/bill.mov" type="video/mp4">
+              <source src="assets/images/bill.mov" type="video/mp4">
             </video>
           </foreignobject>
         </g>
@@ -54,7 +56,17 @@
 
       </svg> 
 
+
     </div>
+    <div class="Spacer-tiny"></div>
+        <p class="style1 style2">
+        Click above to investigate.  </p>
+        <a href="./assets/html/about.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image1','','./assets/images/abouttheproject_selected.gif',1)"><img src="./assets/images/abouttheproject.gif" name="Image1" width="160" height="21" border="0"></a>
+        <div class="Spacer-large"></div>
+        <p>� 2008 Aaron Koblin + Takashi Kawashima</p>
+        </div>
+      </div>
+  
    
     <script>
      
@@ -64,7 +76,7 @@
       var billWidth = individualImageWidth * 100;
       var popupHeight = 90;
       var popupWidth = 400;
-      var edgeMargin = 3;
+      var edgeMargin = 30;
       var popupSideHeight = 84
       var popupSideWidth = 200
       var popupSideMargin = 2
@@ -144,19 +156,19 @@
      
         if (position == 'topLeft'){
           adjustedX = clickedPosition.x - popupWidth/2 + individualImageWidth
-          adjustedY = clickedPosition.y + 15
+          adjustedY = clickedPosition.y + 12
         }
         else if (position == 'bottomLeft'){
           adjustedX = clickedPosition.x - popupWidth/2 + individualImageWidth
-          adjustedY = clickedPosition.y - popupHeight - 15
+          adjustedY = clickedPosition.y - popupHeight - 10
         }
         else if (position == 'topRight'){
           adjustedX = clickedPosition.x  - popupWidth/2 + individualImageWidth
-          adjustedY = clickedPosition.y + 15
+          adjustedY = clickedPosition.y + 12
         }
         else if (position == 'bottomRight'){
           adjustedX = clickedPosition.x  - popupWidth/2 + individualImageWidth
-          adjustedY = clickedPosition.y  - popupHeight - 15
+          adjustedY = clickedPosition.y  - popupHeight - 10
         }
 
         var leftOverhang = clickedPosition.x - popupWidth/2
@@ -204,7 +216,7 @@
         billCoordinates = getBillCoordinates()
         position = getPopUpOrientation(clickedImage, billCoordinates)
         clickedElementPosition = {'x': parseInt(clickedImage.getAttribute('x')), 'y': parseInt(clickedImage.getAttribute('y'))}
-        adjustedPostion = adjustXYPos(clickedElementPosition, position)
+        adjustedPosition = adjustXYPos(clickedElementPosition, position)
         
         var svgns = "http://www.w3.org/2000/svg";
         var popupContainer = document.createElementNS(svgns, 'g');
@@ -213,8 +225,8 @@
         
         var popup = document.createElementNS(svgns, 'rect');
         popup.id = 'popup'
-        popup.setAttributeNS(null, 'x', adjustedPostion.x);
-        popup.setAttributeNS(null, 'y', adjustedPostion.y);
+        popup.setAttributeNS(null, 'x', adjustedPosition.x);
+        popup.setAttributeNS(null, 'y', adjustedPosition.y);
         popup.setAttributeNS(null, 'height', popupHeight);
         popup.setAttributeNS(null, 'width', popupWidth);
         popup.style = 'fill: rgb(255,255,255,1);'
@@ -225,19 +237,19 @@
         pointer.style.fill = "white"
 
         if (position.includes('top')){
-          pointer.setAttribute('points', `${clickedElementPosition.x } ${adjustedPostion.y}, ${clickedElementPosition.x + individualImageWidth/2 } ${adjustedPostion.y-10}, ${clickedElementPosition.x + individualImageWidth} ${adjustedPostion.y}`)
+          pointer.setAttribute('points', `${clickedElementPosition.x + 1} ${adjustedPosition.y}, ${clickedElementPosition.x + individualImageWidth/2 } ${adjustedPosition.y-7}, ${clickedElementPosition.x + individualImageWidth-1} ${adjustedPosition.y}`)
         }
 
         else{
-          pointer.setAttribute('points', `${clickedElementPosition.x} ${clickedElementPosition.y-15}, ${clickedElementPosition.x + individualImageWidth/2 } ${clickedElementPosition.y-individualImageHeight }, ${clickedElementPosition.x + individualImageWidth} ${clickedElementPosition.y -15}`)
+          pointer.setAttribute('points', `${clickedElementPosition.x + 1} ${adjustedPosition.y+90}, ${clickedElementPosition.x + individualImageWidth/2 } ${adjustedPosition.y+97}, ${clickedElementPosition.x + individualImageWidth-1} ${adjustedPosition.y+90}`)
         }
 
         document.getElementById('billContainer').appendChild(pointer)
 
         var popupInnerBox = document.createElementNS(svgns, 'rect');
         popupInnerBox.id = 'popupInnerBox'
-        popupInnerBox.setAttributeNS(null, 'x', adjustedPostion.x+popupSideMargin);
-        popupInnerBox.setAttributeNS(null, 'y', adjustedPostion.y+popupSideMargin);
+        popupInnerBox.setAttributeNS(null, 'x', adjustedPosition.x+popupSideMargin);
+        popupInnerBox.setAttributeNS(null, 'y', adjustedPosition.y+popupSideMargin);
         popupInnerBox.setAttributeNS(null, 'height', popupHeight-(popupSideMargin*2));
         popupInnerBox.setAttributeNS(null, 'width', popupWidth-(popupSideMargin*2));
         popupInnerBox.style = ' fill: grey;'
@@ -245,8 +257,8 @@
 
         var popupLeftSide = document.createElementNS('http://www.w3.org/2000/svg', 'image');
         popupLeftSide.id = `popupLeftSide`
-        popupLeftSide.setAttributeNS(null, 'x', adjustedPostion.x+popupSideMargin);
-        popupLeftSide.setAttributeNS(null, 'y', adjustedPostion.y+popupSideMargin+1);
+        popupLeftSide.setAttributeNS(null, 'x', adjustedPosition.x+popupSideMargin);
+        popupLeftSide.setAttributeNS(null, 'y', adjustedPosition.y+popupSideMargin+1);
         popupLeftSide.setAttributeNS(null, 'height', popupSideHeight);
         popupLeftSide.setAttributeNS(null, 'width', popupSideWidth);
         popupLeftSide.setAttributeNS(null, 'href', `data/images/${clickedImage.id}.jpg`);
@@ -254,8 +266,8 @@
         
         var popupRightSide = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         popupRightSide.id = 'drawingContainer'
-        popupRightSide.setAttributeNS(null, 'x', (adjustedPostion.x+popupSideMargin + popupSideWidth) - popupSideMargin*2 -1);
-        popupRightSide.setAttributeNS(null, 'y', adjustedPostion.y+popupSideMargin+1);
+        popupRightSide.setAttributeNS(null, 'x', (adjustedPosition.x+popupSideMargin + popupSideWidth) - popupSideMargin*2 -1);
+        popupRightSide.setAttributeNS(null, 'y', adjustedPosition.y+popupSideMargin+1);
         popupRightSide.setAttributeNS(null, 'height', popupSideHeight);
         popupRightSide.setAttributeNS(null, 'width', popupSideWidth);
         popupRightSide.setAttributeNS(null, 'href', `data/images/${clickedImage.id}.jpg`);
