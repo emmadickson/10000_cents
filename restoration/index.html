@@ -18,6 +18,9 @@
         width:200px;
         height:85px;
       }
+      #bill{
+        padding-top: 25px;
+      }
     </style>
   </head>
   <body>
@@ -55,13 +58,13 @@
    
     <script>
      
-      var individualImageWidth = 8.1;
+      var individualImageWidth = 8.0;
       var individualImageHeight = 3.4;
       var billHeight =individualImageHeight * 100; 
       var billWidth = individualImageWidth * 100;
       var popupHeight = 90;
       var popupWidth = 400;
-      var edgeMargin = 50;
+      var edgeMargin = 3;
       var popupSideHeight = 84
       var popupSideWidth = 200
       var popupSideMargin = 2
@@ -78,12 +81,12 @@
         billLoadForeignObject.setAttribute('x', edgeMargin)
         billLoadForeignObject.setAttribute('y', edgeMargin)
 
-        y = edgeMargin + individualImageHeight/2
+        y = (edgeMargin) + individualImageHeight/2
       
-        for (var i = 1; i < 100; i++){
-            x = edgeMargin + individualImageWidth/2
+        for (var i = 1; i <= 100; i++){
+            x = edgeMargin + 1.3
           
-            for (var j = 1; j < 100; j++){
+            for (var j = 1; j <= 100; j++){
               
                 var rect = document.createElementNS(svgns, 'rect');
                 rect.id = `${j}.${i}`
@@ -220,12 +223,15 @@
         var pointer = document.createElementNS(svgns, 'polygon');
         pointer.id = 'pointer'
         pointer.style.fill = "white"
+
         if (position.includes('top')){
-          pointer.setAttribute('points', `${clickedElementPosition.x } ${adjustedPostion.y-10}, ${clickedElementPosition.x + individualImageWidth/2 } ${adjustedPostion.y}, ${clickedElementPosition.x + individualImageWidth} ${adjustedPostion.y-10}`)
+          pointer.setAttribute('points', `${clickedElementPosition.x } ${adjustedPostion.y}, ${clickedElementPosition.x + individualImageWidth/2 } ${adjustedPostion.y-10}, ${clickedElementPosition.x + individualImageWidth} ${adjustedPostion.y}`)
         }
+
         else{
-          pointer.setAttribute('points', `${clickedElementPosition.x } ${clickedElementPosition.y-individualImageHeight}, ${clickedElementPosition.x + individualImageWidth/2 } ${clickedElementPosition.y-individualImageHeight - 10}, ${clickedElementPosition.x + individualImageWidth} ${clickedElementPosition.y - individualImageHeight}`)
+          pointer.setAttribute('points', `${clickedElementPosition.x} ${clickedElementPosition.y-15}, ${clickedElementPosition.x + individualImageWidth/2 } ${clickedElementPosition.y-individualImageHeight }, ${clickedElementPosition.x + individualImageWidth} ${clickedElementPosition.y -15}`)
         }
+
         document.getElementById('billContainer').appendChild(pointer)
 
         var popupInnerBox = document.createElementNS(svgns, 'rect');
