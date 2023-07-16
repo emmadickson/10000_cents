@@ -4,11 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>10000 Cents</title>
-    <link rel="stylesheet" href="./assets/css/styles.css">
 
     <style>
         body{
-          background-color: rgb(248,248,248);
+          background-color: rgb(0,0,0);
         }
         #bill_container{
           width:100%;
@@ -58,15 +57,7 @@
 
 
     </div>
-    <div class="Spacer-tiny"></div>
-        <p class="style1 style2">
-        Click above to investigate.  </p>
-        <a href="./assets/html/about.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image1','','./assets/images/abouttheproject_selected.gif',1)"><img src="./assets/images/abouttheproject.gif" name="Image1" width="160" height="21" border="0"></a>
-        <div class="Spacer-large"></div>
-        <p>� 2008 Aaron Koblin + Takashi Kawashima</p>
-        </div>
-      </div>
-  
+
    
     <script>
      
@@ -90,8 +81,8 @@
         bill.style.height = `${billHeight+ (edgeMargin*2)}px`
 
         var billLoadForeignObject = document.getElementById('billForeignObject')
-        billLoadForeignObject.setAttribute('x', edgeMargin)
-        billLoadForeignObject.setAttribute('y', edgeMargin)
+        billLoadForeignObject.setAttribute('x', edgeMargin+1.25)
+        billLoadForeignObject.setAttribute('y', edgeMargin-0.25)
 
         y = (edgeMargin) + individualImageHeight/2
       
