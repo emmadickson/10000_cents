@@ -23,387 +23,392 @@
           padding-top: 50px;
         }
     </style>
+
     </head>
-  <body>
-    <div id="bill_container">
 
-     
-   
-      <svg id="bill">
-        <defs>
-          <filter id="red-glow" x="-250%" y="-250%" width="500%" height="500%">
-            <feFlood result="flood" flood-color="#FC0002" flood-opacity="1"></feFlood>
-            <feComposite in="flood" result="mask" in2="SourceGraphic" operator="in"></feComposite>
-            <feMorphology in="mask" result="dilated" operator="dilate" radius="1"></feMorphology>
-            <feGaussianBlur in="dilated" result="blurred" stdDeviation="3"></feGaussianBlur>
-            <feMerge>
-                <feMergeNode in="blurred"></feMergeNode>
-                <feMergeNode in="SourceGraphic"></feMergeNode>
-            </feMerge>
-        </filter>
-        </defs>
-        <g  id="videoContainer">
-          <foreignobject  id="billForeignObject" x="0" y="0" width="800" height="340">
-            <video width="800" height="340" autoplay="true" muted="true" >
-              <source src="assets/images/bill.mov" type="video/mp4">
-            </video>
-          </foreignobject>
-        </g>
-        <g  id="billContainer">
-        </g>
-       
+    <body>
 
-      </svg> 
-
-
-    </div>
-
-   
-    <script>
-     
-      var individualImageWidth = 8.0;
-      var individualImageHeight = 3.4;
-      var billHeight =individualImageHeight * 100; 
-      var billWidth = individualImageWidth * 100;
-      var popupHeight = 90;
-      var popupWidth = 400;
-      var edgeMargin = 30;
-      var popupSideHeight = 84
-      var popupSideWidth = 200
-      var popupSideMargin = 2
-      var timeout;
-      var svgns = "http://www.w3.org/2000/svg";
-
-      function setupBillSize(){
-       
-        var bill = document.getElementById('bill')
-        bill.style.width = `${billWidth+(edgeMargin*2)}px`
-        bill.style.height = `${billHeight+ (edgeMargin*2)}px`
-
-        var billLoadForeignObject = document.getElementById('billForeignObject')
-        billLoadForeignObject.setAttribute('x', edgeMargin+1.25)
-        billLoadForeignObject.setAttribute('y', edgeMargin-0.25)
-
-        y = (edgeMargin) + individualImageHeight/2
-      
-        for (var i = 1; i <= 100; i++){
-            x = edgeMargin + 1.3
-          
-            for (var j = 1; j <= 100; j++){
-              
-                var rect = document.createElementNS(svgns, 'rect');
-                rect.id = `${j}.${i}`
-                rect.class = "cell"
-                rect.setAttributeNS(null, 'x', x);
-                rect.setAttributeNS(null, 'y', y);
-                rect.setAttributeNS(null, 'height', individualImageHeight);
-                rect.setAttributeNS(null, 'width', individualImageWidth);
-                rect.style.fill = 'rgb(255,255,255,0)'
-                document.getElementById('billContainer').appendChild(rect);
-                x += individualImageWidth
-            }
-            y += individualImageHeight
-        }
-     }
-
-      function getPopUpOrientation(clickedImage, billCoordinates){
-        clickedImageXPos = clickedImage.getAttribute('x') - edgeMargin
-        clickedImageYPos = clickedImage.getAttribute('y') - edgeMargin
-     
-        var midXPoint = (billCoordinates.x2-billCoordinates.x1)/2
-        var midYPoint = (billCoordinates.y2-billCoordinates.y1)/2
-        var position;
-      
-        if (clickedImageXPos > midXPoint && clickedImageYPos < midYPoint){
-          position = 'topRight'
-        }
-        else if (clickedImageXPos > midXPoint && clickedImageYPos > midYPoint){
-          position = 'bottomRight'
-        }
-        else if (clickedImageXPos < midXPoint && clickedImageYPos < midYPoint){
-          position = 'topLeft'
-        }
-        else if (clickedImageXPos < midXPoint && clickedImageYPos > midYPoint){
-          position = 'bottomLeft'
-        }
-        return position
     
+        <svg id="bill">
+
+          <g  id="videoContainer">
+            <foreignobject  id="billForeignObject" x="0" y="0" width="801" height="342">
+              <video width="801" height="342" autoplay="true" muted="true" >
+                <source src="assets/bill.mP4" type="video/mp4">
+              </video>
+            </foreignobject>
+            <g  id="billContainer"></g>
+
+          </g>
+
+        </svg> 
+
+
+      <script>
+      
+        var individualImageWidth = 8.01;
+        var individualImageHeight = 3.42;
+
+        var individualHighlightWidth = 9;
+        var individualHighlightHeight = 5;
+
+        var billHeight =individualImageHeight * 100; 
+        var billWidth = individualImageWidth * 100;
+
+        var overshotCorrection = 1
+        var highlightCorrectionX = 0.5
+        var highlightCorrectionY = 1
+
+        var popupHeight = 90;
+        var popupWidth = 400;
+        var edgeMargin = 30;
+        var popupSideHeight = 84
+        var popupSideWidth = 200
+        var popupSideMargin = 2
+        var timeout;
+        var svgns = "http://www.w3.org/2000/svg";
+
+        function setupBillSize(){
+        
+          var bill = document.getElementById('bill')
+          bill.style.width = `${billWidth+(edgeMargin*2)}px`
+          bill.style.height = `${billHeight+ (edgeMargin*2)}px`
+
+          var billLoadForeignObject = document.getElementById('billForeignObject')
+          billLoadForeignObject.setAttribute('x', edgeMargin)
+          billLoadForeignObject.setAttribute('y', edgeMargin)
+
+          highlightY = (edgeMargin) - overshotCorrection - highlightCorrectionY
+          y = (edgeMargin) - overshotCorrection
+        
+          for (var i = 1; i <= 100; i++){
+              x = edgeMargin - overshotCorrection
+              highlightX = (edgeMargin) - overshotCorrection - highlightCorrectionX
+            
+              for (var j = 1; j <= 100; j++){
+                
+
+                  var highlight = document.createElementNS(svgns, 'rect');
+                  highlight.id = `highlight.${j}.${i}`
+                
+                  highlight.setAttributeNS(null, 'x', x);
+                  highlight.setAttributeNS(null, 'y', y);
+                  highlight.setAttributeNS(null, 'height', individualHighlightHeight);
+                  highlight.setAttributeNS(null, 'width', individualHighlightWidth);
+                  highlight.style.fill = 'rgb(255,255,255,0)'
+              
+                  highlightX += individualHighlightWidth
+
+                  var rect = document.createElementNS(svgns, 'rect');
+                  rect.id = `${j}.${i}`
+                  rect.class = "cell"
+                  rect.setAttributeNS(null, 'x', x);
+                  rect.setAttributeNS(null, 'y', y);
+                  rect.setAttributeNS(null, 'height', individualImageHeight);
+                  rect.setAttributeNS(null, 'width', individualImageWidth);
+                  rect.style.fill = 'rgb(255,255,255,0)'
+                  highlight.appendChild(rect);
+                  document.getElementById('billContainer').appendChild(highlight);
+                  x += individualImageWidth
+              }
+              y += individualImageHeight
+              highlightY += individualHighlightHeight
+          }
       }
 
-      function calculateCenterOfBox(id){
-        var ids = id.split(".")
-        var idX = ids[0]
-        var idY = ids[1]
-
-        centerX = idX * individualImageWidth + (individualImageWidth/2)
-        centerY = idY * individualImageHeight + (individualImageHeight/2)
-
-        return {'x': centerX, 'y': centerY}
-      }
-
-      function adjustXYPos(clickedPosition, position){
-        var adjustedX;
-        var adjustedY;
-     
-        if (position == 'topLeft'){
-          adjustedX = clickedPosition.x - popupWidth/2 + individualImageWidth
-          adjustedY = clickedPosition.y + 12
-        }
-        else if (position == 'bottomLeft'){
-          adjustedX = clickedPosition.x - popupWidth/2 + individualImageWidth
-          adjustedY = clickedPosition.y - popupHeight - 10
-        }
-        else if (position == 'topRight'){
-          adjustedX = clickedPosition.x  - popupWidth/2 + individualImageWidth
-          adjustedY = clickedPosition.y + 12
-        }
-        else if (position == 'bottomRight'){
-          adjustedX = clickedPosition.x  - popupWidth/2 + individualImageWidth
-          adjustedY = clickedPosition.y  - popupHeight - 10
+        function getPopUpOrientation(clickedImage, billCoordinates){
+          clickedImageXPos = clickedImage.getAttribute('x') - edgeMargin
+          clickedImageYPos = clickedImage.getAttribute('y') - edgeMargin
+      
+          var midXPoint = (billCoordinates.x2-billCoordinates.x1)/2
+          var midYPoint = (billCoordinates.y2-billCoordinates.y1)/2
+          var position;
+        
+          if (clickedImageXPos > midXPoint && clickedImageYPos < midYPoint){
+            position = 'topRight'
+          }
+          else if (clickedImageXPos > midXPoint && clickedImageYPos > midYPoint){
+            position = 'bottomRight'
+          }
+          else if (clickedImageXPos < midXPoint && clickedImageYPos < midYPoint){
+            position = 'topLeft'
+          }
+          else if (clickedImageXPos < midXPoint && clickedImageYPos > midYPoint){
+            position = 'bottomLeft'
+          }
+          return position
+      
         }
 
-        var leftOverhang = clickedPosition.x - popupWidth/2
+        function calculateCenterOfBox(id){
+          var ids = id.split(".")
+          var idX = ids[0]
+          var idY = ids[1]
 
+          centerX = idX * individualImageWidth + (individualImageWidth/2)
+          centerY = idY * individualImageHeight + (individualImageHeight/2)
 
-        var rightOverhang =  (billWidth + edgeMargin) - ( clickedPosition.x + popupWidth/2 - edgeMargin/2)
-        if ( leftOverhang < 0){
-          adjustedX = adjustedX + (-1 * leftOverhang)
-        } 
-        if (rightOverhang < 0){
-          console.log("right overhang calculated")
-          console.log(adjustedX)
-
-          adjustedX = adjustedX  + rightOverhang 
-          console.log(adjustedX)
+          return {'x': centerX, 'y': centerY}
         }
-        return {'x': adjustedX, 'y': adjustedY}
-      }
 
-      function readTextFile(file) {
-        var rawFile = new XMLHttpRequest();
-        rawFile.open("GET", file, false);
-        rawFile.onreadystatechange = function () {
-          if(rawFile.readyState === 4)  {
-            if(rawFile.status === 200 || rawFile.status == 0) {
-              var allText = rawFile.responseText;
-              console.log(allText);
+        function adjustXYPos(clickedPosition, position){
+          var adjustedX;
+          var adjustedY;
+      
+          if (position == 'topLeft'){
+            adjustedX = clickedPosition.x - popupWidth/2 + individualImageWidth
+            adjustedY = clickedPosition.y + 12
+          }
+          else if (position == 'bottomLeft'){
+            adjustedX = clickedPosition.x - popupWidth/2 + individualImageWidth
+            adjustedY = clickedPosition.y - popupHeight - 10
+          }
+          else if (position == 'topRight'){
+            adjustedX = clickedPosition.x  - popupWidth/2 + individualImageWidth
+            adjustedY = clickedPosition.y + 12
+          }
+          else if (position == 'bottomRight'){
+            adjustedX = clickedPosition.x  - popupWidth/2 + individualImageWidth
+            adjustedY = clickedPosition.y  - popupHeight - 10
+          }
+
+          var leftOverhang = clickedPosition.x - popupWidth/2
+
+
+          var rightOverhang =  (billWidth + edgeMargin) - ( clickedPosition.x + popupWidth/2 - edgeMargin/2)
+          if ( leftOverhang < 0){
+            adjustedX = adjustedX + (-1 * leftOverhang)
+          } 
+          if (rightOverhang < 0){
+            console.log("right overhang calculated")
+            console.log(adjustedX)
+
+            adjustedX = adjustedX  + rightOverhang 
+            console.log(adjustedX)
+          }
+          return {'x': adjustedX, 'y': adjustedY}
+        }
+
+        function readTextFile(file) {
+          var rawFile = new XMLHttpRequest();
+          rawFile.open("GET", file, false);
+          rawFile.onreadystatechange = function () {
+            if(rawFile.readyState === 4)  {
+              if(rawFile.status === 200 || rawFile.status == 0) {
+                var allText = rawFile.responseText;
+                console.log(allText);
+              }
             }
           }
+          rawFile.send(null);
         }
-        rawFile.send(null);
-      }
-      
-      function rgbToHex(r, g, b) {
-        return "#" + (1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1);
-      }
-
-      function getBillCoordinates(){
-        return {'x1': edgeMargin, 'y1': edgeMargin, 'x2': billWidth + edgeMargin, 'y2': billHeight + edgeMargin}
-      }
-
-      function createPopUpBox(clickedImage){
-        clearInterval(timeout)
-        event.srcElement.style="fill:red; stroke:red; stroke-width:1; filter:url(#red-glow)"
-        billCoordinates = getBillCoordinates()
-        position = getPopUpOrientation(clickedImage, billCoordinates)
-        clickedElementPosition = {'x': parseInt(clickedImage.getAttribute('x')), 'y': parseInt(clickedImage.getAttribute('y'))}
-        adjustedPosition = adjustXYPos(clickedElementPosition, position)
         
-        var svgns = "http://www.w3.org/2000/svg";
-        var popupContainer = document.createElementNS(svgns, 'g');
-        popupContainer.id = "popupContainer"
-        popupContainer.style = 'fill: rgb(255,255,255,1);'
-        
-        var popup = document.createElementNS(svgns, 'rect');
-        popup.id = 'popup'
-        popup.setAttributeNS(null, 'x', adjustedPosition.x);
-        popup.setAttributeNS(null, 'y', adjustedPosition.y);
-        popup.setAttributeNS(null, 'height', popupHeight);
-        popup.setAttributeNS(null, 'width', popupWidth);
-        popup.style = 'fill: rgb(255,255,255,1);'
-        popupContainer.appendChild(popup)
-
-        var pointer = document.createElementNS(svgns, 'polygon');
-        pointer.id = 'pointer'
-        pointer.style.fill = "white"
-
-        if (position.includes('top')){
-          pointer.setAttribute('points', `${clickedElementPosition.x + 1} ${adjustedPosition.y}, ${clickedElementPosition.x + individualImageWidth/2 } ${adjustedPosition.y-7}, ${clickedElementPosition.x + individualImageWidth-1} ${adjustedPosition.y}`)
+        function rgbToHex(r, g, b) {
+          return "#" + (1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1);
         }
 
-        else{
-          pointer.setAttribute('points', `${clickedElementPosition.x + 1} ${adjustedPosition.y+90}, ${clickedElementPosition.x + individualImageWidth/2 } ${adjustedPosition.y+97}, ${clickedElementPosition.x + individualImageWidth-1} ${adjustedPosition.y+90}`)
+        function getBillCoordinates(){
+          return {'x1': edgeMargin, 'y1': edgeMargin, 'x2': billWidth + edgeMargin, 'y2': billHeight + edgeMargin}
         }
 
-        document.getElementById('billContainer').appendChild(pointer)
+        function createPopUpBox(clickedImage){
+          clearInterval(timeout)
+          clickedImage = event.srcElement.children[0]
+          event.srcElement.style="fill:red; stroke:red; stroke-width:1; "
+          event.srcElement.children[0].style="fill:red;"
+          billCoordinates = getBillCoordinates()
+          position = getPopUpOrientation(clickedImage, billCoordinates)
+          clickedElementPosition = {'x': parseInt(clickedImage.getAttribute('x')), 'y': parseInt(clickedImage.getAttribute('y'))}
+          adjustedPosition = adjustXYPos(clickedElementPosition, position)
+          
+          var svgns = "http://www.w3.org/2000/svg";
+          var popupContainer = document.createElementNS(svgns, 'g');
+          popupContainer.id = "popupContainer"
+          popupContainer.style = 'fill: rgb(255,255,255,1);'
+          
+          var popup = document.createElementNS(svgns, 'rect');
+          popup.id = 'popup'
+          popup.setAttributeNS(null, 'x', adjustedPosition.x);
+          popup.setAttributeNS(null, 'y', adjustedPosition.y);
+          popup.setAttributeNS(null, 'height', popupHeight);
+          popup.setAttributeNS(null, 'width', popupWidth);
+          popup.style = 'fill: rgb(255,255,255,1);'
+          popupContainer.appendChild(popup)
 
-        var popupInnerBox = document.createElementNS(svgns, 'rect');
-        popupInnerBox.id = 'popupInnerBox'
-        popupInnerBox.setAttributeNS(null, 'x', adjustedPosition.x+popupSideMargin);
-        popupInnerBox.setAttributeNS(null, 'y', adjustedPosition.y+popupSideMargin);
-        popupInnerBox.setAttributeNS(null, 'height', popupHeight-(popupSideMargin*2));
-        popupInnerBox.setAttributeNS(null, 'width', popupWidth-(popupSideMargin*2));
-        popupInnerBox.style = ' fill: grey;'
-        popupContainer.appendChild(popupInnerBox)
+          var pointer = document.createElementNS(svgns, 'polygon');
+          pointer.id = 'pointer'
+          pointer.style.fill = "white"
 
-        var popupLeftSide = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-        popupLeftSide.id = `popupLeftSide`
-        popupLeftSide.setAttributeNS(null, 'x', adjustedPosition.x+popupSideMargin);
-        popupLeftSide.setAttributeNS(null, 'y', adjustedPosition.y+popupSideMargin+1);
-        popupLeftSide.setAttributeNS(null, 'height', popupSideHeight);
-        popupLeftSide.setAttributeNS(null, 'width', popupSideWidth);
-        popupLeftSide.setAttributeNS(null, 'href', `data/images/${clickedImage.id}.jpg`);
-        popupContainer.appendChild(popupLeftSide);
-        
-        var popupRightSide = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        popupRightSide.id = 'drawingContainer'
-        popupRightSide.setAttributeNS(null, 'x', (adjustedPosition.x+popupSideMargin + popupSideWidth) - popupSideMargin*2 -1);
-        popupRightSide.setAttributeNS(null, 'y', adjustedPosition.y+popupSideMargin+1);
-        popupRightSide.setAttributeNS(null, 'height', popupSideHeight);
-        popupRightSide.setAttributeNS(null, 'width', popupSideWidth);
-        popupRightSide.setAttributeNS(null, 'href', `data/images/${clickedImage.id}.jpg`);
-        popupContainer.appendChild(popupRightSide);
+          if (position.includes('top')){
+            pointer.setAttribute('points', `${clickedElementPosition.x + 1} ${adjustedPosition.y}, ${clickedElementPosition.x + individualImageWidth/2 } ${adjustedPosition.y-7}, ${clickedElementPosition.x + individualImageWidth-1} ${adjustedPosition.y}`)
+          }
 
-        var background = document.createElementNS(svgns, 'rect');
-        background.setAttributeNS(null, 'x',0);
-        background.setAttributeNS(null, 'y', 0);
-        background.setAttributeNS(null, 'height', popupSideHeight);
-        background.setAttributeNS(null, 'width', popupSideWidth);
-        background.style = ' fill: white;'
+          else{
+            pointer.setAttribute('points', `${clickedElementPosition.x + 1} ${adjustedPosition.y+90}, ${clickedElementPosition.x + individualImageWidth/2 } ${adjustedPosition.y+97}, ${clickedElementPosition.x + individualImageWidth-1} ${adjustedPosition.y+90}`)
+          }
 
-        popupRightSide.append(background)
+          document.getElementById('billContainer').appendChild(pointer)
 
-        popupContainer.drawing = true
+          var popupInnerBox = document.createElementNS(svgns, 'rect');
+          popupInnerBox.id = 'popupInnerBox'
+          popupInnerBox.setAttributeNS(null, 'x', adjustedPosition.x+popupSideMargin);
+          popupInnerBox.setAttributeNS(null, 'y', adjustedPosition.y+popupSideMargin);
+          popupInnerBox.setAttributeNS(null, 'height', popupHeight-(popupSideMargin*2));
+          popupInnerBox.setAttributeNS(null, 'width', popupWidth-(popupSideMargin*2));
+          popupInnerBox.style = ' fill: grey;'
+          popupContainer.appendChild(popupInnerBox)
 
-        fetch(`data/drawing_instructions/${clickedImage.id}.txt`)
-        .then((res) => res.text())
-        .then((text) => {
-          function parseCommand(i) {
-           
-         
-            if ( i < commands.length - 1){
+          var popupLeftSide = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+          popupLeftSide.id = `popupLeftSide`
+          popupLeftSide.setAttributeNS(null, 'x', adjustedPosition.x+popupSideMargin);
+          popupLeftSide.setAttributeNS(null, 'y', adjustedPosition.y+popupSideMargin+1);
+          popupLeftSide.setAttributeNS(null, 'height', popupSideHeight);
+          popupLeftSide.setAttributeNS(null, 'width', popupSideWidth);
+          popupLeftSide.setAttributeNS(null, 'href', `data/images/${clickedImage.id}.jpg`);
+          popupContainer.appendChild(popupLeftSide);
+          
+          var popupRightSide = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+          popupRightSide.id = 'drawingContainer'
+          popupRightSide.setAttributeNS(null, 'x', (adjustedPosition.x+popupSideMargin + popupSideWidth) - popupSideMargin*2 -1);
+          popupRightSide.setAttributeNS(null, 'y', adjustedPosition.y+popupSideMargin+1);
+          popupRightSide.setAttributeNS(null, 'height', popupSideHeight);
+          popupRightSide.setAttributeNS(null, 'width', popupSideWidth);
+          popupRightSide.setAttributeNS(null, 'href', `data/images/${clickedImage.id}.jpg`);
+          popupContainer.appendChild(popupRightSide);
 
-              command = commands[i]
-              if (command.length > 0){
-                parts = commands[i].split(".")
-                
-                if (parts[0] == 'c'){
-                  color = rgbToHex(parts[1], parts[2], parts[3])
-                }
+          var background = document.createElementNS(svgns, 'rect');
+          background.setAttributeNS(null, 'x',0);
+          background.setAttributeNS(null, 'y', 0);
+          background.setAttributeNS(null, 'height', popupSideHeight);
+          background.setAttributeNS(null, 'width', popupSideWidth);
+          background.style = ' fill: white;'
 
-                else{
-                  if (parts[0] == 's'){
-                    thickness= (parts[1] / 0.85) * scale
+          popupRightSide.append(background)
+
+          popupContainer.drawing = true
+
+          fetch(`data/drawing_instructions/${clickedImage.id}.txt`)
+          .then((res) => res.text())
+          .then((text) => {
+            function parseCommand(i) {
+            
+          
+              if ( i < commands.length - 1){
+
+                command = commands[i]
+                if (command.length > 0){
+                  parts = commands[i].split(".")
+                  
+                  if (parts[0] == 'c'){
+                    color = rgbToHex(parts[1], parts[2], parts[3])
                   }
 
-                  else {
-                      thickness = thickness
-                      var newLine = document.createElementNS('http://www.w3.org/2000/svg','line');
+                  else{
+                    if (parts[0] == 's'){
+                      thickness= (parts[1] / 0.85) * scale
+                    }
+
+                    else {
+                        thickness = thickness
+                        var newLine = document.createElementNS('http://www.w3.org/2000/svg','line');
+                        
+                        newLine.setAttribute('x1', parts[0] * scale);
+                        newLine.setAttribute('y1', parts[1] * scale);
+                        newLine.setAttribute('x2',  (parts[2]) * scale );
+                        newLine.setAttribute('y2',(parts[3] * scale));
+                        newLine.setAttribute('stroke-linecap', "round");
+                        newLine.style = ` stroke:${color}; stroke-width: ${thickness}; `
                       
-                      newLine.setAttribute('x1', parts[0] * scale);
-                      newLine.setAttribute('y1', parts[1] * scale);
-                      newLine.setAttribute('x2',  (parts[2]) * scale );
-                      newLine.setAttribute('y2',(parts[3] * scale));
-                      newLine.setAttribute('stroke-linecap', "round");
-                      newLine.style = ` stroke:${color}; stroke-width: ${thickness}; `
-                     
-                      var container = document.getElementById('drawingContainer')
-                      container.appendChild(newLine)
-                      
+                        var container = document.getElementById('drawingContainer')
+                        container.appendChild(newLine)
+                        
+                    }
                   }
                 }
               }
+              i++
+              timeout = setTimeout(function () {
+                  parseCommand(i);
+              }, 6);
             }
-            i++
-            timeout = setTimeout(function () {
-                parseCommand(i);
-            }, 6);
-          }
-          
-          
-          // do something with "text"
-          commands = text.split("drawing=")[1]
-          curCommand = 0;
-          thickness = 1;
-          color = 'black';
-          scale = 0.5
-          commands = commands.split("_");
-          numCommands = commands.length;
-          var i = 0;
+            
+            
+            // do something with "text"
+            commands = text.split("drawing=")[1]
+            curCommand = 0;
+            thickness = 1;
+            color = 'black';
+            scale = 0.5
+            commands = commands.split("_");
+            numCommands = commands.length;
+            var i = 0;
 
-          parseCommand(i)
-        })
-        .catch((e) => console.error(e));
-      
-        document.getElementById('bill').appendChild(popupContainer);
-      
-      }
-
-      setupBillSize()
-
-      document.getElementById('bill').addEventListener('click', function (event) {
-     
-       if (event.srcElement.tagName == 'rect'){
-          if (document.getElementById('popupContainer') != null ){
-            var alreadyExists = document.getElementById('popupContainer');
-            var parent = alreadyExists.parentNode
-            parent.removeChild(alreadyExists)
-            var pointer = document.getElementById('pointer');
-            var pointerParent = pointer.parentNode
-            pointerParent.removeChild(pointer)
-           }
-           clearInterval(timeout)
-          createPopUpBox(event.srcElement)
+            parseCommand(i)
+          })
+          .catch((e) => console.error(e));
+        
+          document.getElementById('bill').appendChild(popupContainer);
+        
         }
-      }, false);
 
-      document.getElementById('bill').addEventListener('mouseover', function (event) {
-        if (event.srcElement.tagName == 'rect' && event.srcElement.class == 'cell'){
-          xValue = event.srcElement.x.baseVal.value
-          yValue = event.srcElement.y.baseVal.value
+        setupBillSize()
 
-          if (xValue > edgeMargin && yValue > edgeMargin){
-            event.srcElement.style="fill: rgb(255,255,255,0); stroke:red; stroke-width:1;" 
-          }
-        }
+        document.getElementById('bill').addEventListener('click', function (event) {
       
-      }, false);
-
-      document.getElementById('bill').addEventListener('mouseout', function (event) {
-        if (event.srcElement.tagName == 'rect' && event.srcElement.class == 'cell'){
-          xValue = event.srcElement.x.baseVal.value
-          yValue = event.srcElement.y.baseVal.value
-         
-          if (xValue > edgeMargin && yValue > edgeMargin){
-            event.srcElement.style="fill: rgb(255,255,255,0)" 
-          }
-          
-          var popupContainer = document.getElementById('popupContainer')
-         
-          if (popupContainer != null ){
-            var alreadyExists = document.getElementById('popupContainer');
-            var parent = alreadyExists.parentNode
-            parent.removeChild(alreadyExists)
-            var pointer = document.getElementById('pointer');
-            var pointerParent = pointer.parentNode
-            pointerParent.removeChild(pointer)
+        if (event.srcElement.tagName == 'rect'){
+            if (document.getElementById('popupContainer') != null ){
+              var alreadyExists = document.getElementById('popupContainer');
+              var parent = alreadyExists.parentNode
+              parent.removeChild(alreadyExists)
+              var pointer = document.getElementById('pointer');
+              var pointerParent = pointer.parentNode
+              pointerParent.removeChild(pointer)
+            }
             clearInterval(timeout)
-           }
-        }
-       
-      }, false);
+            createPopUpBox(event.srcElement)
+          }
+        }, false);
 
-    </script>
-	  <script src="index.js"></script>
-    <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+        document.getElementById('bill').addEventListener('mouseover', function (event) {
 
-		<script type="importmap">
-			{
-				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/"
-				}
-			}
-		</script>
-  </body>
+          if (event.srcElement.tagName == 'rect' && event.srcElement.children[0].class == 'cell'){
+            
+
+            xValue = event.srcElement.x.baseVal.value
+            yValue = event.srcElement.y.baseVal.value
+        
+            console.log( event.srcElement)
+            event.srcElement.style="fill: rgb(255,255,255,0);  stroke:red; stroke-width:1; " 
+         
+          }
+        
+        }, false);
+
+        document.getElementById('bill').addEventListener('mouseout', function (event) {
+          if (event.srcElement.tagName == 'rect' && event.srcElement.children[0].class == 'cell'){
+            xValue = event.srcElement.x.baseVal.value
+            yValue = event.srcElement.y.baseVal.value
+          
+            event.srcElement.style="fill: rgb(255,255,255,0)" 
+         
+            
+            var popupContainer = document.getElementById('popupContainer')
+          
+            if (popupContainer != null ){
+              var alreadyExists = document.getElementById('popupContainer');
+              var parent = alreadyExists.parentNode
+              parent.removeChild(alreadyExists)
+              var pointer = document.getElementById('pointer');
+              var pointerParent = pointer.parentNode
+              pointerParent.removeChild(pointer)
+              clearInterval(timeout)
+            }
+          }
+        
+        }, false);
+
+      </script>
+
+    </body>
+
 </html>
