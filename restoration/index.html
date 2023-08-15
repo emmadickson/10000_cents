@@ -113,7 +113,7 @@
                   highlight.setAttributeNS(null, 'y', y);
                   highlight.setAttributeNS(null, 'height', individualHighlightHeight);
                   highlight.setAttributeNS(null, 'width', individualHighlightWidth);
-                  highlight.style.fill = 'rgb(255,255,255,0)'
+                  highlight.style = 'fill: rgb(255,255,255,0); stroke: red; stroke-width: 1'
               
                   highlightX += individualHighlightWidth
 
@@ -124,7 +124,7 @@
                   rect.setAttributeNS(null, 'y', y);
                   rect.setAttributeNS(null, 'height', individualImageHeight);
                   rect.setAttributeNS(null, 'width', individualImageWidth);
-                  rect.style.fill = 'rgb(255,255,255,0)'
+                  rect.style.fill = 'rgb(255,255,255,0); '
                   highlight.appendChild(rect);
                   document.getElementById('billContainer').appendChild(highlight);
                   x += individualImageWidth
