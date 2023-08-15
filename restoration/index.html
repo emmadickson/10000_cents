@@ -6,9 +6,19 @@
     <title>10000 Cents</title>
 
     <style>
+       
+        .Spacer-large {
+          height: 30px;
+          display: table;
+          margin-right: auto;
+          margin-left: auto;
+          font-size: 12px;
+          font-family: Arial, sans-serif;
+
+        }
         body{
-          cursor: none; 
           background-color: rgb(255,255,255);
+          cursor: none
         }
         #bill_container{
           width:100%;
@@ -46,7 +56,9 @@
           </g>
 
         </svg> 
-
+        <div class="Spacer-large">
+          <p>� 2008 Aaron Koblin + Takashi Kawashima</p>
+        </div>
 
       <script>
       
@@ -64,13 +76,15 @@
         var highlightCorrectionY = 1
 
         var popupHeight = 90;
-        var popupWidth = 400;
+        var popupWidth = 405;
         var edgeMargin = 30;
         var popupSideHeight = 84
-        var popupSideWidth = 200
+        var popupSideWidth = 202
         var popupSideMargin = 2
         var timeout;
         var svgns = "http://www.w3.org/2000/svg";
+
+        var overhangCorrection = 5
 
         function setupBillSize(){
         
@@ -176,7 +190,7 @@
             adjustedY = clickedPosition.y  - popupHeight - 10
           }
 
-          var leftOverhang = clickedPosition.x - popupWidth/2
+          var leftOverhang = clickedPosition.x - popupWidth/2 + overhangCorrection
 
 
           var rightOverhang =  (billWidth + edgeMargin) - ( clickedPosition.x + popupWidth/2 - edgeMargin/2)
@@ -184,11 +198,7 @@
             adjustedX = adjustedX + (-1 * leftOverhang)
           } 
           if (rightOverhang < 0){
-            console.log("right overhang calculated")
-            console.log(adjustedX)
-
             adjustedX = adjustedX  + rightOverhang 
-            console.log(adjustedX)
           }
           return {'x': adjustedX, 'y': adjustedY}
         }
@@ -244,11 +254,11 @@
           pointer.style.fill = "white"
 
           if (position.includes('top')){
-            pointer.setAttribute('points', `${clickedElementPosition.x + 1} ${adjustedPosition.y}, ${clickedElementPosition.x + individualImageWidth/2 } ${adjustedPosition.y-7}, ${clickedElementPosition.x + individualImageWidth-1} ${adjustedPosition.y}`)
+            pointer.setAttribute('points', `${clickedElementPosition.x + 4} ${adjustedPosition.y}, ${clickedElementPosition.x + individualImageWidth/2 + 3 } ${adjustedPosition.y-7}, ${clickedElementPosition.x + individualImageWidth + 2} ${adjustedPosition.y}`)
           }
 
           else{
-            pointer.setAttribute('points', `${clickedElementPosition.x + 1} ${adjustedPosition.y+90}, ${clickedElementPosition.x + individualImageWidth/2 } ${adjustedPosition.y+97}, ${clickedElementPosition.x + individualImageWidth-1} ${adjustedPosition.y+90}`)
+            pointer.setAttribute('points', `${clickedElementPosition.x + 4} ${adjustedPosition.y+90}, ${clickedElementPosition.x + individualImageWidth/2 + 3 } ${adjustedPosition.y+97}, ${clickedElementPosition.x + individualImageWidth + 2} ${adjustedPosition.y+90}`)
           }
 
           document.getElementById('billContainer').appendChild(pointer)
@@ -259,7 +269,7 @@
           popupInnerBox.setAttributeNS(null, 'y', adjustedPosition.y+popupSideMargin);
           popupInnerBox.setAttributeNS(null, 'height', popupHeight-(popupSideMargin*2));
           popupInnerBox.setAttributeNS(null, 'width', popupWidth-(popupSideMargin*2));
-          popupInnerBox.style = ' fill: grey;'
+          popupInnerBox.style = ' fill: rgb(175,175,175);'
           popupContainer.appendChild(popupInnerBox)
 
           var popupLeftSide = document.createElementNS('http://www.w3.org/2000/svg', 'image');
