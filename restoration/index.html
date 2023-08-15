@@ -63,9 +63,10 @@
         </div>
 
       <script>
-      
-        var individualImageWidth = 8.0;
-        var individualImageHeight = 3;
+        
+        
+        var individualImageWidth = 8;
+        var individualImageHeight = 4;
 
         var individualHighlightWidth = 9;
         var individualHighlightHeight = 4;
@@ -73,7 +74,6 @@
         var billHeight =individualImageHeight * 100; 
         var billWidth = individualImageWidth * 100;
 
-        var overshotCorrection = 1
         var highlightCorrectionX = 0.5
         var highlightCorrectionY = 1
 
@@ -87,6 +87,26 @@
         var svgns = "http://www.w3.org/2000/svg";
 
         var overhangCorrection = 5
+        var showGrid = false
+        document.onkeypress = function (e) {
+            e = e || window.event;
+            console.log(e.keyCode)
+            if (e.keyCode == 99){
+              showGrid = !showGrid
+              highlights = document.getElementsByClassName('highlight')
+              console.log(highlights)
+              if (showGrid){
+                for (var i = 0; i < highlights.length; i++){
+                  highlights[i].style = 'fill: rgb(255,255,255,0); stroke: red; stroke-width: 1'
+                }
+              }
+             else{
+                for (var i = 0; i < highlights.length; i++){
+                  highlights[i].style = 'fill: rgb(255,255,255,0); stroke: red; stroke-width: 0'
+                }
+              }
+            }
+        };
 
         function setupBillSize(){
         
@@ -98,24 +118,24 @@
           billLoadForeignObject.setAttribute('x', edgeMargin)
           billLoadForeignObject.setAttribute('y', edgeMargin)
 
-          highlightY = (edgeMargin) - overshotCorrection - highlightCorrectionY
-          y = (edgeMargin) - overshotCorrection
+          highlightY = (edgeMargin) - highlightCorrectionY
+          y = (edgeMargin)
         
           for (var i = 1; i <= 100; i++){
-              x = edgeMargin - overshotCorrection
-              highlightX = (edgeMargin) - overshotCorrection - highlightCorrectionX
+              x = edgeMargin 
+              highlightX = (edgeMargin) - highlightCorrectionX
             
               for (var j = 1; j <= 100; j++){
                 
 
                   var highlight = document.createElementNS(svgns, 'rect');
                   highlight.id = `highlight.${j}.${i}`
-                
+                  highlight.setAttribute('class', 'highlight')
                   highlight.setAttributeNS(null, 'x', x);
                   highlight.setAttributeNS(null, 'y', y);
                   highlight.setAttributeNS(null, 'height', individualHighlightHeight);
                   highlight.setAttributeNS(null, 'width', individualHighlightWidth);
-                  highlight.style = 'fill: rgb(255,255,255,0); stroke: red; stroke-width: 1'
+                  highlight.style = 'fill: rgb(255,255,255,0); '
               
                   highlightX += individualHighlightWidth
 
@@ -131,7 +151,7 @@
                   document.getElementById('billContainer').appendChild(highlight);
                   x += individualImageWidth
               }
-              y += individualImageHeight
+              y += individualImageHeight - 0.6
               highlightY += individualHighlightHeight
           }
       }
@@ -393,7 +413,6 @@
             xValue = event.srcElement.x.baseVal.value
             yValue = event.srcElement.y.baseVal.value
         
-            console.log( event.srcElement)
             event.srcElement.style="fill: rgb(255,255,255,0);  stroke:red; stroke-width:1; " 
          
           }
