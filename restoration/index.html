@@ -66,17 +66,14 @@
       <script>
         
         
-        var individualImageWidth = 8;
-        var individualImageHeight = 3.42;
-
-        var individualHighlightWidth = 9;
-        var individualHighlightHeight = 4;
+        var individualImageWidth = 9;
+        var individualImageHeight = 4;
 
         var billHeight =individualImageHeight * 100; 
         var billWidth = individualImageWidth * 100;
-
-        var highlightCorrectionX = 0.5
-        var highlightCorrectionY = 1
+     
+        var overlapX = 1
+        var overlapY = [4, 3, 3, 4, 3]
 
         var popupHeight = 90;
         var popupWidth = 405;
@@ -94,7 +91,7 @@
             console.log(e.keyCode)
             if (e.keyCode == 99){
               showGrid = !showGrid
-              highlights = document.getElementsByClassName('highlight')
+              highlights = document.getElementsByClassName('cell')
               console.log(highlights)
               if (showGrid){
                 for (var i = 0; i < highlights.length; i++){
@@ -110,7 +107,7 @@
         };
 
         function setupBillSize(){
-        
+          
           var bill = document.getElementById('bill')
           bill.style.width = `${billWidth+(edgeMargin*2)}px`
           bill.style.height = `${billHeight+ (edgeMargin*2)}px`
@@ -119,41 +116,31 @@
           billLoadForeignObject.setAttribute('x', edgeMargin)
           billLoadForeignObject.setAttribute('y', edgeMargin)
 
-          highlightY = (edgeMargin) - highlightCorrectionY
+          overlapYPos = 0
+
           y = (edgeMargin)
         
           for (var i = 1; i <= 100; i++){
               x = edgeMargin 
-              highlightX = (edgeMargin) - highlightCorrectionX
             
               for (var j = 1; j <= 100; j++){
-                
-
-                  var highlight = document.createElementNS(svgns, 'rect');
-                  highlight.id = `highlight.${j}.${i}`
-                  highlight.setAttribute('class', 'highlight')
-                  highlight.setAttributeNS(null, 'x', x);
-                  highlight.setAttributeNS(null, 'y', y);
-                  highlight.setAttributeNS(null, 'height', individualHighlightHeight);
-                  highlight.setAttributeNS(null, 'width', individualHighlightWidth);
-                  highlight.style = 'fill: rgb(255,255,255,0); '
-              
-                  highlightX += individualHighlightWidth
 
                   var rect = document.createElementNS(svgns, 'rect');
                   rect.id = `${j}.${i}`
-                  rect.class = "cell"
+                  rect.setAttribute('class', 'cell')
                   rect.setAttributeNS(null, 'x', x);
                   rect.setAttributeNS(null, 'y', y);
                   rect.setAttributeNS(null, 'height', individualImageHeight);
                   rect.setAttributeNS(null, 'width', individualImageWidth);
-                  rect.style.fill = 'rgb(255,255,255,0); '
-                  highlight.appendChild(rect);
-                  document.getElementById('billContainer').appendChild(highlight);
-                  x += individualImageWidth
+                  rect.style = 'fill: rgb(255,255,255,0); '
+                  document.getElementById('billContainer').appendChild(rect);
+                  x += individualImageWidth - overlapX
               }
-              y += individualImageHeight
-              highlightY += individualHighlightHeight
+              y += overlapY[overlapYPos]
+              overlapYPos += 1
+              if (overlapYPos > overlapY.length - 1){
+                overlapYPos = 0
+              }
           }
       }
 
@@ -250,9 +237,9 @@
 
         function createPopUpBox(clickedImage){
           clearInterval(timeout)
-          clickedImage = event.srcElement.children[0]
+          clickedImage = event.srcElement
           event.srcElement.style="fill:red; stroke:red; stroke-width:1; "
-          event.srcElement.children[0].style="fill:red;"
+          event.srcElement.style="fill:red;"
           billCoordinates = getBillCoordinates()
           position = getPopUpOrientation(clickedImage, billCoordinates)
           clickedElementPosition = {'x': parseInt(clickedImage.getAttribute('x')), 'y': parseInt(clickedImage.getAttribute('y'))}
@@ -407,10 +394,8 @@
         }, false);
 
         document.getElementById('bill').addEventListener('mouseover', function (event) {
-
-          if (event.srcElement.tagName == 'rect' && event.srcElement.children[0].class == 'cell'){
+          if (event.srcElement.tagName == 'rect' && 'cell' == event.srcElement.classList[0]){
             
-
             xValue = event.srcElement.x.baseVal.value
             yValue = event.srcElement.y.baseVal.value
         
@@ -421,7 +406,7 @@
         }, false);
 
         document.getElementById('bill').addEventListener('mouseout', function (event) {
-          if (event.srcElement.tagName == 'rect' && event.srcElement.children[0].class == 'cell'){
+          if (event.srcElement.tagName == 'rect' && 'cell' == event.srcElement.classList[0]){
             xValue = event.srcElement.x.baseVal.value
             yValue = event.srcElement.y.baseVal.value
           
