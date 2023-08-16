@@ -2,6 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
+ 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>10000 Cents</title>
 
@@ -50,7 +51,7 @@
           <g  id="videoContainer">
             <foreignobject  id="billForeignObject" x="0" y="0" width="801" height="342">
               <video width="801" height="342" autoplay="true" muted="true" >
-                <source src="assets/bill_og.mov" type="video/mp4">
+                <source src="assets/bill_convert.mp4" type="video/mp4">
               </video>
             </foreignobject>
             <g  id="billContainer"></g>
@@ -66,7 +67,7 @@
         
         
         var individualImageWidth = 8;
-        var individualImageHeight = 4;
+        var individualImageHeight = 3.42;
 
         var individualHighlightWidth = 9;
         var individualHighlightHeight = 4;
@@ -151,7 +152,7 @@
                   document.getElementById('billContainer').appendChild(highlight);
                   x += individualImageWidth
               }
-              y += individualImageHeight - 0.6
+              y += individualImageHeight
               highlightY += individualHighlightHeight
           }
       }
