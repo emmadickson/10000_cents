@@ -86,6 +86,7 @@
         var popupHeight = 90;
         var popupWidth = 405;
         var edgeMargin = 30;
+        var edgeMarginY = 31;
         var popupSideHeight = 84
         var popupSideWidth = 202
         var popupSideMargin = 2
@@ -126,10 +127,10 @@
 
           overlapYPos = 0
 
-          y = (edgeMargin) 
+          y = edgeMarginY
         
           for (var i = 1; i <= 100; i++){
-              x = edgeMargin 
+              x = edgeMargin
             
               for (var j = 1; j <= 100; j++){
 
@@ -252,8 +253,8 @@
         function createPopUpBox(clickedImage){
           clearInterval(timeout)
           clickedImage = event.srcElement
+   
           event.srcElement.style="fill:red; stroke:red; stroke-width:1; "
-          event.srcElement.style="fill:red;"
           billCoordinates = getBillCoordinates()
           position = getPopUpOrientation(clickedImage, billCoordinates)
           clickedElementPosition = {'x': parseInt(clickedImage.getAttribute('x')), 'y': parseInt(clickedImage.getAttribute('y'))}
