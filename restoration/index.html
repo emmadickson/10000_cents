@@ -126,7 +126,7 @@
           overlapYPos = 0
 
           y = edgeMarginY
-        
+       
           for (var i = 1; i <= 100; i++){
               x = edgeMargin
             
@@ -143,17 +143,20 @@
                   document.getElementById('billContainer').appendChild(rect);
                   x += individualImageWidth - overlapX
               }
-              if (i != 1 && i != 100){
+             
+           
+               if(i!= 1 && i != 100){
+                console.log( `i: ${i} at ${(y + overlapY[overlapYPos])-y}`)
                 y += overlapY[overlapYPos]
                 overlapYPos += 1
-                if (overlapYPos > overlapY.length - 1){
-                  overlapYPos = 0
-                }
-              }
+       
+               }
               else{
-                console.log("onetow")
+                console.log(`i: ${i} at ${(y+individualImageHeight)-y}`)
+
                 y += individualImageHeight
-              }
+               }
+           
           }
       }
 
