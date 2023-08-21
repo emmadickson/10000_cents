@@ -10,15 +10,7 @@
        * {
           shape-rendering: crispEdges;
         }
-        .Spacer-large {
-          height: 30px;
-          display: table;
-          margin-right: auto;
-          margin-left: auto;
-          font-size: 12px;
-          font-family: Arial, sans-serif;
 
-        }
         body{
           background-color: black;
           cursor: none
@@ -29,19 +21,12 @@
           justify-content: center;
           cursor: none;
         }
-        #drawingContainer{
-          width:200px;
-          height:85px;
-        }
         #bill{
-          padding-top: 16px;
-          display: table;
-          margin-right: auto;
-          margin-left: auto;
-          max-width: 862px;
-          min-width: 862px;
-          max-height: 402px;
-          min-height: 402px;
+          margin: 0;
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
           width: 862px!important;
           height: 402px!important
 
@@ -71,35 +56,56 @@
 
       <script>
         
+        /* VARIABLE DECLARATIONS */
         
+        // General Variables
+        var svgns = "http://www.w3.org/2000/svg";
+        var showGrid = false
+
+        // Sets height of the red cursor
         var individualImageWidth = 9;
         var individualImageHeight = 4;
 
+        // Sets overal size of the bill for internal calculations
         var billHeight =individualImageHeight * 100; 
         var billWidth = individualImageWidth * 100;
-     
+        
+        // The grid we use to select and display individual images has an overlap pattern. This sets it.
         var overlapX = 1
         var overlapY = [3,3,4,3,4,3,3,4,3,4,3,3,4,3,4,3,3,4,3,4,3,3,4,3,3,4,3,4,3,3,4,3,4,3,3,4,3,4,3,4,3,3,4,3,4,3,3,4,3,4,3,3,4,3,4,3,3,4,3,4,3,3,4,3,4,3,3,4,3,4,3,3,4,3,4,3,3,4,3,4,3,3,4,3,4,3,3,4,3,4,3,3,4,3,4,3,3,4]
 
+        // The flash original moved the red cursor with a 'buffer' in regards to mouse position. You could go a few pixels
+        // Outside of the selected box before it would move. This emulates that.
+        var lastMousedPos = null
+        var mouseYBuffer = 2;
+        var mouseXBuffer = 1;
+
+        // Sets the variables used to create the popup draing box
         var popupHeight = 90;
         var popupWidth = 405;
+
         var edgeMargin = 30;
         var edgeMarginY = 31;
+
         var popupSideHeight = 84
         var popupSideWidth = 202
         var popupSideMargin = 2
-        var timeout;
-        var svgns = "http://www.w3.org/2000/svg";
 
         var overhangCorrection = 5
-        var showGrid = false
+
+        var timeout;
+
+        /* ------------------------------------------------------------------------------------------------------------------------------------------------------ */
+
+       
+        /* DEBUG */
+
+        // FOR DEBUG ONLY, overlays the grid on the bill
         document.onkeypress = function (e) {
             e = e || window.event;
-            console.log(e.keyCode)
             if (e.keyCode == 99){
               showGrid = !showGrid
               highlights = document.getElementsByClassName('cell')
-              console.log(highlights)
               if (showGrid){
                 for (var i = 0; i < highlights.length; i++){
                   highlights[i].style = 'fill: rgb(255,255,255,0); stroke: red; stroke-width: 1'
@@ -113,6 +119,34 @@
             }
         };
 
+        /* ------------------------------------------------------------------------------------------------------------------------------------------------------ */
+
+        
+        /* GENERAL FUNCTIONS */
+
+        /* Fetches the local instruction file*/
+        function readTextFile(file) {
+          var rawFile = new XMLHttpRequest();
+          rawFile.open("GET", file, false);
+          rawFile.onreadystatechange = function () {
+            if(rawFile.readyState === 4)  {
+              if(rawFile.status === 200 || rawFile.status == 0) {
+                var allText = rawFile.responseText;
+              }
+            }
+          }
+          rawFile.send(null);
+        }
+        
+        /* Converts rgb color code to hex */
+        function rgbToHex(r, g, b) {
+          return "#" + (1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1);
+        }
+        
+        /* ------------------------------------------------------------------------------------------------------------------------------------------------------ */
+
+
+        /* Creates the grid that will ovrlay the bill and allow us to select particular images*/
         function setupBillSize(){
           
           var bill = document.getElementById('bill')
@@ -131,7 +165,7 @@
               x = edgeMargin
             
               for (var j = 1; j <= 100; j++){
-
+                  
                   var rect = document.createElementNS(svgns, 'rect');
                   rect.id = `${j}.${i}`
                   rect.setAttribute('class', 'cell')
@@ -146,14 +180,11 @@
              
            
                if(i!= 1 && i != 100){
-                console.log( `i: ${i} at ${(y + overlapY[overlapYPos])-y}`)
                 y += overlapY[overlapYPos]
                 overlapYPos += 1
        
                }
               else{
-                console.log(`i: ${i} at ${(y+individualImageHeight)-y}`)
-
                 y += individualImageHeight
                }
            
@@ -229,23 +260,7 @@
           return {'x': adjustedX, 'y': adjustedY}
         }
 
-        function readTextFile(file) {
-          var rawFile = new XMLHttpRequest();
-          rawFile.open("GET", file, false);
-          rawFile.onreadystatechange = function () {
-            if(rawFile.readyState === 4)  {
-              if(rawFile.status === 200 || rawFile.status == 0) {
-                var allText = rawFile.responseText;
-                console.log(allText);
-              }
-            }
-          }
-          rawFile.send(null);
-        }
-        
-        function rgbToHex(r, g, b) {
-          return "#" + (1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1);
-        }
+       
 
         function getBillCoordinates(){
           return {'x1': edgeMargin, 'y1': edgeMargin, 'x2': billWidth + edgeMargin, 'y2': billHeight + edgeMargin}
@@ -409,40 +424,82 @@
           }
         }, false);
 
-        document.getElementById('bill').addEventListener('mouseover', function (event) {
-          if (event.srcElement.tagName == 'rect' && 'cell' == event.srcElement.classList[0]){
-            
-            xValue = event.srcElement.x.baseVal.value
-            yValue = event.srcElement.y.baseVal.value
+
+        /* MOUSE FUNCTIONS */
+
+
+        function moveToNewBox(localMousePos,  newTarget){
         
-            event.srcElement.style="fill: rgb(255,255,255,0);  stroke:red; stroke-width:1; " 
+          if (lastMousedPos['lastElement'] != newTarget){
+            offset = document.getElementById(newTarget.id).getBoundingClientRect()
+            adjustedX = event.clientX - offset.left;
+            adjustedY = event.clientY - offset.top;
+
+           
+            if (adjustedX > mouseXBuffer || adjustedY > mouseYBuffer || adjustedY < -1 * mouseYBuffer){
+              return true
+            }
+
+          }
+
+           
+          return false
+ 
+        }
+
+       window.addEventListener('mousemove', function (event) {
+          if (event.srcElement.tagName == 'rect' && 'cell' == event.srcElement.classList[0]){
+          
+            var offSetRect = document.getElementById('billContainer').getBoundingClientRect()
+
+            const localX = event.clientX - offSetRect.left;
+            const localY = event.clientY - offSetRect.top;
+            localMousePos = { x: localX, y: localY };
+           
+            console.log(localMousePos)
+            if (lastMousedPos == null){
+              lastMousedPos = {'x': x, 'y': y, 'lastElement': event.srcElement}
+            }
+
+            var move = true
+       
+            move = moveToNewBox(localMousePos,  event.srcElement)
+           
+            lastMousedPos['x'] = localX
+            lastMousedPos['y'] = localY
+            
+            if (move){
+              lastID = lastMousedPos['lastElement'].id
+              document.getElementById(lastID).style = "fill: rgb(255,255,255,0); stroke-width: 0" 
+             
+              event.srcElement.style="fill: rgb(255,255,255,0);  stroke:red; stroke-width:1; " 
          
+              var popupContainer = document.getElementById('popupContainer')
+            
+              if (popupContainer != null ){
+                var alreadyExists = document.getElementById('popupContainer');
+                var parent = alreadyExists.parentNode
+                parent.removeChild(alreadyExists)
+                var pointer = document.getElementById('pointer');
+                var pointerParent = pointer.parentNode
+                pointerParent.removeChild(pointer)
+                clearInterval(timeout)
+              }        
+              
+              lastMousedPos['lastElement'] = event.srcElement
+              }
+            else{
+              console.log('stay')
+            }
+     
+       
           }
         
         }, false);
 
-        document.getElementById('bill').addEventListener('mouseout', function (event) {
-          if (event.srcElement.tagName == 'rect' && 'cell' == event.srcElement.classList[0]){
-            xValue = event.srcElement.x.baseVal.value
-            yValue = event.srcElement.y.baseVal.value
-          
-            event.srcElement.style="fill: rgb(255,255,255,0)" 
-         
-            
-            var popupContainer = document.getElementById('popupContainer')
-          
-            if (popupContainer != null ){
-              var alreadyExists = document.getElementById('popupContainer');
-              var parent = alreadyExists.parentNode
-              parent.removeChild(alreadyExists)
-              var pointer = document.getElementById('pointer');
-              var pointerParent = pointer.parentNode
-              pointerParent.removeChild(pointer)
-              clearInterval(timeout)
-            }
-          }
-        
-        }, false);
+       
+
+        /* ------------------------------------------------------------------------------------------------------------------------------------------------------ */
 
       </script>
 
