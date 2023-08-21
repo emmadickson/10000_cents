@@ -175,7 +175,7 @@
                   rect.setAttributeNS(null, 'width', individualImageWidth);
                   rect.style = 'fill: rgb(255,255,255,0); '
                   document.getElementById('billContainer').appendChild(rect);
-                  x += individualImageWidth - overlapX
+                  x += individualImageWidth 
               }
              
            
@@ -269,7 +269,8 @@
         function createPopUpBox(clickedImage){
           clearInterval(timeout)
           clickedImage = event.srcElement
-   
+          console.log("CLICK")
+          console.log(clickedImage)
           event.srcElement.style="fill:red; stroke:red; stroke-width:1; "
           billCoordinates = getBillCoordinates()
           position = getPopUpOrientation(clickedImage, billCoordinates)
