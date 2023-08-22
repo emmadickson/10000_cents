@@ -13,13 +13,12 @@
 
         body{
           background-color: black;
-          cursor: none
         }
         #bill_container{
           width:100%;
           display: flex;
           justify-content: center;
-          cursor: none;
+/*cursor: none;*/
         }
         #bill{
           margin: 0;
@@ -57,7 +56,9 @@
       <script>
         
         /* VARIABLE DECLARATIONS */
-        
+        var actualBillHeight = 342;
+        var actualBillWidth = 801;
+
         // General Variables
         var svgns = "http://www.w3.org/2000/svg";
         var showGrid = false
@@ -73,19 +74,15 @@
         // The grid we use to select and display individual images has an overlap pattern. This sets it.
         var overlapX = 1
         var overlapY = [3,3,4,3,4,3,3,4,3,4,3,3,4,3,4,3,3,4,3,4,3,3,4,3,3,4,3,4,3,3,4,3,4,3,3,4,3,4,3,4,3,3,4,3,4,3,3,4,3,4,3,3,4,3,4,3,3,4,3,4,3,3,4,3,4,3,3,4,3,4,3,3,4,3,4,3,3,4,3,4,3,3,4,3,4,3,3,4,3,4,3,3,4,3,4,3,3,4]
-
-        // The flash original moved the red cursor with a 'buffer' in regards to mouse position. You could go a few pixels
-        // Outside of the selected box before it would move. This emulates that.
-        var lastMousedPos = null
-        var mouseYBuffer = 2;
-        var mouseXBuffer = 1;
+        var selectedRect = null;
+        var clickedRect = null; 
 
         // Sets the variables used to create the popup draing box
         var popupHeight = 90;
         var popupWidth = 405;
 
         var edgeMargin = 30;
-        var edgeMarginY = 31;
+        var edgeMarginY = 30;
 
         var popupSideHeight = 84
         var popupSideWidth = 202
@@ -159,10 +156,10 @@
 
           overlapYPos = 0
 
-          y = edgeMarginY
+          y = edgeMargin + 1
        
           for (var i = 1; i <= 100; i++){
-              x = edgeMargin
+              x = edgeMargin + 1
             
               for (var j = 1; j <= 100; j++){
                   
@@ -175,11 +172,11 @@
                   rect.setAttributeNS(null, 'width', individualImageWidth);
                   rect.style = 'fill: rgb(255,255,255,0); '
                   document.getElementById('billContainer').appendChild(rect);
-                  x += individualImageWidth 
+                  x += individualImageWidth  
               }
              
            
-               if(i!= 1 && i != 100){
+               if (i!= 1 && i != 100){
                 y += overlapY[overlapYPos]
                 overlapYPos += 1
        
@@ -269,9 +266,7 @@
         function createPopUpBox(clickedImage){
           clearInterval(timeout)
           clickedImage = event.srcElement
-          console.log("CLICK")
-          console.log(clickedImage)
-          event.srcElement.style="fill:red; stroke:red; stroke-width:1; "
+         
           billCoordinates = getBillCoordinates()
           position = getPopUpOrientation(clickedImage, billCoordinates)
           clickedElementPosition = {'x': parseInt(clickedImage.getAttribute('x')), 'y': parseInt(clickedImage.getAttribute('y'))}
@@ -408,30 +403,17 @@
         }
 
         setupBillSize()
-
-        document.getElementById('bill').addEventListener('click', function (event) {
-      
-        if (event.srcElement.tagName == 'rect'){
-            if (document.getElementById('popupContainer') != null ){
-              var alreadyExists = document.getElementById('popupContainer');
-              var parent = alreadyExists.parentNode
-              parent.removeChild(alreadyExists)
-              var pointer = document.getElementById('pointer');
-              var pointerParent = pointer.parentNode
-              pointerParent.removeChild(pointer)
-            }
-            clearInterval(timeout)
-            createPopUpBox(event.srcElement)
-          }
-        }, false);
+        
+        function distance(x1, y1, x2, y2) {
+          var dx = x2-x1
+          var dy = y2-y1
+          return Math.sqrt(dx*dx+dy*dy);
+        }
 
 
         /* MOUSE FUNCTIONS */
 
-
-
         window.addEventListener('mousemove', function (event) {
-          
           var offSetRect = document.getElementById('billContainer').getBoundingClientRect()
           const localX = event.clientX - offSetRect.left ;
           const localY = event.clientY - offSetRect.top  ;
@@ -443,8 +425,7 @@
           overX = Math.round(overX * 10) / 10
           overY = Math.round(overY * 10) / 10;
 
-          console.log(`x within bill: ${localX}, y within bill: ${localY}`)
-          console.log(`adjusted x: ${overX} adjusted y: ${overY}`)
+        
 
           rectX = (overX/8) + 1
           rectY = (overY/3.4) + 1
@@ -453,24 +434,66 @@
           rectY = Math.floor(rectY)
 
           id = `${rectX}.${rectY}`
-          
-          console.log(`fetching id: ${id}`)
 
-            if (selectedRect != null){
+          if (selectedRect != null){
               selectedRect.style= "fill: rgb(255,255,255,0);  stroke:red; stroke-width:0";
             }
 
-            selectedRect = document.getElementById(id)
+          if (overX > -1 && overY > -1 && overX < actualBillWidth && overY < actualBillHeight){
+            console.log(`x within bill: ${localX}, y within bill: ${localY}`)
+            console.log(`adjusted x: ${overX} adjusted y: ${overY}`)
 
-            if (selectedRect != null){
-              selectedRect.style = "fill: rgb(255,255,255,0);  stroke:red; stroke-width:1";
+            if (clickedRect != null){
+             
+              if (distance(clickedRect.getAttribute('x'), clickedRect.getAttribute('y'), localX, localY)>10) {
+                clickedRect = null;
+                selectedRect.style= "fill: rgb(255,255,255,0);  stroke:red; stroke-width:0";
+                    var alreadyExists = document.getElementById('popupContainer');
+                  var parent = alreadyExists.parentNode
+                  parent.removeChild(alreadyExists)
+                  var pointer = document.getElementById('pointer');
+                  var pointerParent = pointer.parentNode
+                  pointerParent.removeChild(pointer)
+                clearInterval(timeout)
+              }
+              else{
+                console.log(clickedRect)
+              }
+              
             }
-
-       
+            
+           
+            selectedRect = document.getElementById(id)
+            selectedRect.style = "fill: rgb(255,255,255,0);  stroke:red; stroke-width:1";
           
+
+          }
+          
+
+         
+            
+         
         
         }, false);
 
+
+        
+      document.getElementById('bill').addEventListener('click', function (event) {
+        clickedRect = selectedRect
+        clickedRect.style="fill:red; stroke:red; stroke-width:1; "
+        if (document.getElementById('popupContainer') != null ){
+              var alreadyExists = document.getElementById('popupContainer');
+              var parent = alreadyExists.parentNode
+              parent.removeChild(alreadyExists)
+              var pointer = document.getElementById('pointer');
+              var pointerParent = pointer.parentNode
+              pointerParent.removeChild(pointer)
+            }
+            clearInterval(timeout)
+            createPopUpBox(event.srcElement)
+          
+
+      }, false);
 
         /* ------------------------------------------------------------------------------------------------------------------------------------------------------ */
 
