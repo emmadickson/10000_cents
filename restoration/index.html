@@ -405,8 +405,8 @@
         setupBillSize()
         
         function distance(x1, y1, x2, y2) {
-          var dx = x2-x1
-          var dy = y2-y1
+          var dx = x1 - x2 
+          var dy = y1 - y2 
           return Math.sqrt(dx*dx+dy*dy);
         }
 
@@ -437,15 +437,21 @@
 
           if (selectedRect != null){
               selectedRect.style= "fill: rgb(255,255,255,0);  stroke:red; stroke-width:0";
-            }
+          }
+
+          if (clickedRect != null){
+            clickedRect.style="fill:red; stroke:red; stroke-width:1; "
+          }
 
           if (overX > -1 && overY > -1 && overX <= actualBillWidth && overY <= actualBillHeight){
             console.log(`x within bill: ${localX}, y within bill: ${localY}`)
             console.log(`adjusted x: ${overX} adjusted y: ${overY}`)
 
             if (clickedRect != null){
-             
-              if (distance(clickedRect.getAttribute('x'), clickedRect.getAttribute('y'), localX, localY)>10) {
+              distanceClick = distance(clickedRect.getAttribute('x'), clickedRect.getAttribute('y'), localX+edgeMargin, localY+edgeMarginY)
+
+              if ( distanceClick > 10 ) {
+                clickedRect.style = "fill: rgb(255,255,255,0);  stroke:red; stroke-width:0";
                 clickedRect = null;
                 selectedRect.style= "fill: rgb(255,255,255,0);  stroke:red; stroke-width:0";
                     var alreadyExists = document.getElementById('popupContainer');
@@ -456,15 +462,16 @@
                   pointerParent.removeChild(pointer)
                 clearInterval(timeout)
               }
-              else{
-                console.log(clickedRect)
-              }
+           
               
             }
             
            
             selectedRect = document.getElementById(id)
-            selectedRect.style = "fill: rgb(255,255,255,0);  stroke:red; stroke-width:1";
+            if (selectedRect != clickedRect){
+              selectedRect.style = "fill: rgb(255,255,255,0);  stroke:red; stroke-width:1";
+
+            }
           
 
           }
@@ -479,19 +486,20 @@
 
         
       document.getElementById('bill').addEventListener('click', function (event) {
-        clickedRect = selectedRect
-        clickedRect.style="fill:red; stroke:red; stroke-width:1; "
-        if (document.getElementById('popupContainer') != null ){
-              var alreadyExists = document.getElementById('popupContainer');
-              var parent = alreadyExists.parentNode
-              parent.removeChild(alreadyExists)
-              var pointer = document.getElementById('pointer');
-              var pointerParent = pointer.parentNode
-              pointerParent.removeChild(pointer)
-            }
-            clearInterval(timeout)
-            createPopUpBox(event.srcElement)
-          
+        if (overX > -1 && overY > -1 && overX <= actualBillWidth && overY <= actualBillHeight){
+          clickedRect = selectedRect
+          clickedRect.style="fill:red; stroke:red; stroke-width:1; "
+          if (document.getElementById('popupContainer') != null ){
+                var alreadyExists = document.getElementById('popupContainer');
+                var parent = alreadyExists.parentNode
+                parent.removeChild(alreadyExists)
+                var pointer = document.getElementById('pointer');
+                var pointerParent = pointer.parentNode
+                pointerParent.removeChild(pointer)
+              }
+              clearInterval(timeout)
+              createPopUpBox(event.srcElement)
+        }
 
       }, false);
 
