@@ -439,7 +439,7 @@
               selectedRect.style= "fill: rgb(255,255,255,0);  stroke:red; stroke-width:0";
             }
 
-          if (overX > -1 && overY > -1 && overX < actualBillWidth && overY < actualBillHeight){
+          if (overX > -1 && overY > -1 && overX <= actualBillWidth && overY <= actualBillHeight){
             console.log(`x within bill: ${localX}, y within bill: ${localY}`)
             console.log(`adjusted x: ${overX} adjusted y: ${overY}`)
 
