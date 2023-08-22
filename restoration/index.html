@@ -429,76 +429,48 @@
         /* MOUSE FUNCTIONS */
 
 
-        function moveToNewBox(localMousePos,  newTarget){
-        
-          if (lastMousedPos['lastElement'] != newTarget){
-            offset = document.getElementById(newTarget.id).getBoundingClientRect()
-            adjustedX = event.clientX - offset.left;
-            adjustedY = event.clientY - offset.top;
 
-           
-            if (adjustedX > mouseXBuffer || adjustedY > mouseYBuffer || adjustedY < -1 * mouseYBuffer){
-              return true
-            }
-
-          }
-
-           
-          return false
- 
-        }
-
-       window.addEventListener('mousemove', function (event) {
-          if (event.srcElement.tagName == 'rect' && 'cell' == event.srcElement.classList[0]){
+        window.addEventListener('mousemove', function (event) {
           
-            var offSetRect = document.getElementById('billContainer').getBoundingClientRect()
+          var offSetRect = document.getElementById('billContainer').getBoundingClientRect()
+          const localX = event.clientX - offSetRect.left ;
+          const localY = event.clientY - offSetRect.top  ;
+          localMousePos = { x: localX, y: localY };
+          
+          overX = Math.floor((localX)/8)*8;
+          overY = Math.floor((localY)/3.4)*3.4;
 
-            const localX = event.clientX - offSetRect.left;
-            const localY = event.clientY - offSetRect.top;
-            localMousePos = { x: localX, y: localY };
-           
-            console.log(localMousePos)
-            if (lastMousedPos == null){
-              lastMousedPos = {'x': x, 'y': y, 'lastElement': event.srcElement}
+          overX = Math.round(overX * 10) / 10
+          overY = Math.round(overY * 10) / 10;
+
+          console.log(`x within bill: ${localX}, y within bill: ${localY}`)
+          console.log(`adjusted x: ${overX} adjusted y: ${overY}`)
+
+          rectX = (overX/8) + 1
+          rectY = (overY/3.4) + 1
+
+          rectX = Math.floor(rectX)
+          rectY = Math.floor(rectY)
+
+          id = `${rectX}.${rectY}`
+          
+          console.log(`fetching id: ${id}`)
+
+            if (selectedRect != null){
+              selectedRect.style= "fill: rgb(255,255,255,0);  stroke:red; stroke-width:0";
             }
 
-            var move = true
-       
-            move = moveToNewBox(localMousePos,  event.srcElement)
-           
-            lastMousedPos['x'] = localX
-            lastMousedPos['y'] = localY
-            
-            if (move){
-              lastID = lastMousedPos['lastElement'].id
-              document.getElementById(lastID).style = "fill: rgb(255,255,255,0); stroke-width: 0" 
-             
-              event.srcElement.style="fill: rgb(255,255,255,0);  stroke:red; stroke-width:1; " 
-         
-              var popupContainer = document.getElementById('popupContainer')
-            
-              if (popupContainer != null ){
-                var alreadyExists = document.getElementById('popupContainer');
-                var parent = alreadyExists.parentNode
-                parent.removeChild(alreadyExists)
-                var pointer = document.getElementById('pointer');
-                var pointerParent = pointer.parentNode
-                pointerParent.removeChild(pointer)
-                clearInterval(timeout)
-              }        
-              
-              lastMousedPos['lastElement'] = event.srcElement
-              }
-            else{
-              console.log('stay')
+            selectedRect = document.getElementById(id)
+
+            if (selectedRect != null){
+              selectedRect.style = "fill: rgb(255,255,255,0);  stroke:red; stroke-width:1";
             }
-     
+
        
-          }
+          
         
         }, false);
 
-       
 
         /* ------------------------------------------------------------------------------------------------------------------------------------------------------ */
 
