@@ -79,13 +79,13 @@
 
         // Sets the variables used to create the popup draing box
         var popupHeight = 90;
-        var popupWidth = 405;
+        var popupWidth = 406;
 
         var edgeMargin = 30;
         var edgeMarginY = 30;
 
         var popupSideHeight = 84
-        var popupSideWidth = 202
+        var popupSideWidth = 203
         var popupSideMargin = 2
 
         var overhangCorrection = 5
@@ -285,7 +285,7 @@
           popup.setAttributeNS(null, 'width', popupWidth);
           popup.style = 'fill: rgb(255,255,255,1);'
           popupContainer.appendChild(popup)
-
+          console.log(popup)
           var pointer = document.createElementNS(svgns, 'polygon');
           pointer.id = 'pointer'
           pointer.style.fill = "white"
@@ -300,32 +300,27 @@
 
           document.getElementById('billContainer').appendChild(pointer)
 
-          var popupInnerBox = document.createElementNS(svgns, 'rect');
-          popupInnerBox.id = 'popupInnerBox'
-          popupInnerBox.setAttributeNS(null, 'x', adjustedPosition.x+popupSideMargin);
-          popupInnerBox.setAttributeNS(null, 'y', adjustedPosition.y+popupSideMargin);
-          popupInnerBox.setAttributeNS(null, 'height', popupHeight-(popupSideMargin*2));
-          popupInnerBox.setAttributeNS(null, 'width', popupWidth-(popupSideMargin*2));
-          popupInnerBox.style = ' fill: rgb(175,175,175);'
-          popupContainer.appendChild(popupInnerBox)
+       
 
-          var popupLeftSide = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-          popupLeftSide.id = `popupLeftSide`
-          popupLeftSide.setAttributeNS(null, 'x', adjustedPosition.x+popupSideMargin);
-          popupLeftSide.setAttributeNS(null, 'y', adjustedPosition.y+popupSideMargin+1);
-          popupLeftSide.setAttributeNS(null, 'height', popupSideHeight);
-          popupLeftSide.setAttributeNS(null, 'width', popupSideWidth);
-          popupLeftSide.setAttributeNS(null, 'href', `data/images/${clickedImage.id}.jpg`);
-          popupContainer.appendChild(popupLeftSide);
-          
           var popupRightSide = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
           popupRightSide.id = 'drawingContainer'
-          popupRightSide.setAttributeNS(null, 'x', (adjustedPosition.x+popupSideMargin + popupSideWidth) - popupSideMargin*2 -1);
+          popupRightSide.setAttributeNS(null, 'x', (adjustedPosition.x + popupSideWidth)  - popupSideMargin  -1 );
           popupRightSide.setAttributeNS(null, 'y', adjustedPosition.y+popupSideMargin+1);
           popupRightSide.setAttributeNS(null, 'height', popupSideHeight);
           popupRightSide.setAttributeNS(null, 'width', popupSideWidth);
           popupRightSide.setAttributeNS(null, 'href', `data/images/${clickedImage.id}.jpg`);
           popupContainer.appendChild(popupRightSide);
+          
+          var popupLeftSide = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+          popupLeftSide.id = `popupLeftSide`
+          popupLeftSide.setAttributeNS(null, 'x', (adjustedPosition.x) + popupSideMargin -1);
+          popupLeftSide.setAttributeNS(null, 'y', adjustedPosition.y+popupSideMargin + 1);
+          popupLeftSide.setAttributeNS(null, 'height', popupSideHeight+1);
+          popupLeftSide.setAttributeNS(null, 'width', popupSideWidth  );
+          popupLeftSide.setAttributeNS(null, 'href', `data/images/${clickedImage.id}.jpg`);
+          popupContainer.appendChild(popupLeftSide);
+          console.log(popupLeftSide)
+       
 
           var background = document.createElementNS(svgns, 'rect');
           background.setAttributeNS(null, 'x',0);
@@ -336,8 +331,20 @@
 
           popupRightSide.append(background)
 
-          popupContainer.drawing = true
+          var popupInnerBox = document.createElementNS(svgns, 'rect');
+          popupInnerBox.id = 'popupInnerBox'
+          popupInnerBox.setAttributeNS(null, 'x', adjustedPosition.x+popupSideMargin+1);
+          popupInnerBox.setAttributeNS(null, 'y', adjustedPosition.y+popupSideMargin+1);
+          popupInnerBox.setAttributeNS(null, 'height', popupHeight-(popupSideMargin*2)-1);
+          popupInnerBox.setAttributeNS(null, 'width', popupWidth-(popupSideMargin*2)-1);
+          popupInnerBox.style = ' fill:rgb(255,255,255,0); stroke: rgb(175,175,175); stroke-width: 1px'
+          popupContainer.appendChild(popupInnerBox)
 
+
+
+          popupContainer.drawing = true
+          console.log(popupContainer)
+          console.log("poop")
           fetch(`data/drawing_instructions/${clickedImage.id}.txt`)
           .then((res) => res.text())
           .then((text) => {
@@ -450,7 +457,7 @@
             if (clickedRect != null){
               distanceClick = distance(clickedRect.getAttribute('x'), clickedRect.getAttribute('y'), localX+edgeMargin, localY+edgeMarginY)
 
-              if ( distanceClick > 10 ) {
+             /* if ( distanceClick > 10 ) {
                 clickedRect.style = "fill: rgb(255,255,255,0);  stroke:red; stroke-width:0";
                 clickedRect = null;
                 selectedRect.style= "fill: rgb(255,255,255,0);  stroke:red; stroke-width:0";
@@ -462,7 +469,7 @@
                   pointerParent.removeChild(pointer)
                 clearInterval(timeout)
               }
-           
+           */
               
             }
             
