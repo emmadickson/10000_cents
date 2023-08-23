@@ -343,8 +343,6 @@
 
 
           popupContainer.drawing = true
-          console.log(popupContainer)
-          console.log("poop")
           fetch(`data/drawing_instructions/${clickedImage.id}.txt`)
           .then((res) => res.text())
           .then((text) => {
@@ -457,7 +455,7 @@
             if (clickedRect != null){
               distanceClick = distance(clickedRect.getAttribute('x'), clickedRect.getAttribute('y'), localX+edgeMargin, localY+edgeMarginY)
 
-             /* if ( distanceClick > 10 ) {
+             if ( distanceClick > 10 ) {
                 clickedRect.style = "fill: rgb(255,255,255,0);  stroke:red; stroke-width:0";
                 clickedRect = null;
                 selectedRect.style= "fill: rgb(255,255,255,0);  stroke:red; stroke-width:0";
@@ -469,7 +467,7 @@
                   pointerParent.removeChild(pointer)
                 clearInterval(timeout)
               }
-           */
+ 
               
             }
             
@@ -494,8 +492,12 @@
         
       document.getElementById('bill').addEventListener('click', function (event) {
         if (overX > -1 && overY > -1 && overX <= actualBillWidth && overY <= actualBillHeight){
+          if (clickedRect != null){
+            clickedRect.style= "fill: rgb(255,255,255,0);  stroke:red; stroke-width:0";
+          } 
           clickedRect = selectedRect
           clickedRect.style="fill:red; stroke:red; stroke-width:1; "
+         
           if (document.getElementById('popupContainer') != null ){
                 var alreadyExists = document.getElementById('popupContainer');
                 var parent = alreadyExists.parentNode
