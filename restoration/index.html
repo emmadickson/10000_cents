@@ -206,24 +206,22 @@
 
           if (clickedY > edgeMarginY + (billHeight/2)){
             adjustedX = parseInt(clickedX) - popupWidth/2 + 5
-            adjustedY = parseInt(clickedY) - parseInt(popupHeight)- 8
+            adjustedY = parseInt(clickedY) - parseInt(popupHeight)- 10
             console.log("bottom?")
           }
 
           else{
             console.log('top')
             adjustedX = parseInt(clickedX) - popupWidth/2 + 5
-            adjustedY = parseInt(clickedY) +6 + 7
+            adjustedY = parseInt(clickedY) +6 + 6
             console.log(clickedY)
           }
 
           if (clickedX < edgeMargin + 180){
-            console.log('farther left')
-            adjustedX = edgeMargin - 15
+            adjustedX = edgeMargin - 23
           }
           
           if (clickedX > edgeMargin + (billWidth - 180)){
-            console.log('farther right')
             adjustedX = edgeMargin  + (billWidth - 180) - popupWidth/2
           }
 
