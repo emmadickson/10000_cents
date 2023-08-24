@@ -188,90 +188,48 @@
           }
       }
 
-        function getPopUpOrientation(clickedImage, billCoordinates){
-          clickedImageXPos = clickedImage.getAttribute('x') - edgeMargin
-          clickedImageYPos = clickedImage.getAttribute('y') - edgeMargin
-      
-          var midXPoint = (billCoordinates.x2-billCoordinates.x1)/2
-          var midYPoint = (billCoordinates.y2-billCoordinates.y1)/2
-          var position;
-        
-          if (clickedImageXPos > midXPoint && clickedImageYPos < midYPoint){
-            position = 'topRight'
-          }
-          else if (clickedImageXPos > midXPoint && clickedImageYPos > midYPoint){
-            position = 'bottomRight'
-          }
-          else if (clickedImageXPos < midXPoint && clickedImageYPos < midYPoint){
-            position = 'topLeft'
-          }
-          else if (clickedImageXPos < midXPoint && clickedImageYPos > midYPoint){
-            position = 'bottomLeft'
-          }
-          return position
-      
-        }
-
-        function calculateCenterOfBox(id){
-          var ids = id.split(".")
-          var idX = ids[0]
-          var idY = ids[1]
-
-          centerX = idX * individualImageWidth + (individualImageWidth/2)
-          centerY = idY * individualImageHeight + (individualImageHeight/2)
-
-          return {'x': centerX, 'y': centerY}
-        }
-
-        function adjustXYPos(clickedPosition, position){
-          var adjustedX;
-          var adjustedY;
-      
-          if (position == 'topLeft'){
-            adjustedX = clickedPosition.x - popupWidth/2 + individualImageWidth
-            adjustedY = clickedPosition.y + 12
-          }
-          else if (position == 'bottomLeft'){
-            adjustedX = clickedPosition.x - popupWidth/2 + individualImageWidth
-            adjustedY = clickedPosition.y - popupHeight - 10
-          }
-          else if (position == 'topRight'){
-            adjustedX = clickedPosition.x  - popupWidth/2 + individualImageWidth
-            adjustedY = clickedPosition.y + 12
-          }
-          else if (position == 'bottomRight'){
-            adjustedX = clickedPosition.x  - popupWidth/2 + individualImageWidth
-            adjustedY = clickedPosition.y  - popupHeight - 10
-          }
-
-          var leftOverhang = clickedPosition.x - popupWidth/2 + overhangCorrection
-
-
-          var rightOverhang =  (billWidth + edgeMargin) - ( clickedPosition.x + popupWidth/2 - edgeMargin/2)
-          if ( leftOverhang < 0){
-            adjustedX = adjustedX + (-1 * leftOverhang)
-          } 
-          if (rightOverhang < 0){
-            adjustedX = adjustedX  + rightOverhang 
-          }
-          return {'x': adjustedX, 'y': adjustedY}
-        }
-
-       
+    
 
         function getBillCoordinates(){
-          return {'x1': edgeMargin, 'y1': edgeMargin, 'x2': billWidth + edgeMargin, 'y2': billHeight + edgeMargin}
+          return {'x1': edgeMargin, 'y1': edgeMarginY}
         }
 
         function createPopUpBox(clickedImage){
+          billPosition = getBillCoordinates()
           clearInterval(timeout)
           clickedImage = event.srcElement
-         
-          billCoordinates = getBillCoordinates()
-          position = getPopUpOrientation(clickedImage, billCoordinates)
-          clickedElementPosition = {'x': parseInt(clickedImage.getAttribute('x')), 'y': parseInt(clickedImage.getAttribute('y'))}
-          adjustedPosition = adjustXYPos(clickedElementPosition, position)
           
+          clickedX = clickedImage.getAttribute('x')
+
+          clickedY = clickedImage.getAttribute('y')
+          console.log(`initial clicked x ${clickedX} y: ${clickedY}`)
+
+          if (clickedY > edgeMarginY + (billHeight/2)){
+            adjustedX = parseInt(clickedX) - popupWidth/2 + 5
+            adjustedY = parseInt(clickedY) - parseInt(popupHeight)- 8
+            console.log("bottom?")
+          }
+
+          else{
+            console.log('top')
+            adjustedX = parseInt(clickedX) - popupWidth/2 + 5
+            adjustedY = parseInt(clickedY) +6 + 7
+            console.log(clickedY)
+          }
+
+          if (clickedX < edgeMargin + 180){
+            console.log('farther left')
+            adjustedX = edgeMargin - 15
+          }
+          
+          if (clickedX > edgeMargin + (billWidth - 180)){
+            console.log('farther right')
+            adjustedX = edgeMargin  + (billWidth - 180) - popupWidth/2
+          }
+
+          adjustedPosition = {'x': adjustedX, 'y': adjustedY}
+          console.log(`adjusted position x: ${adjustedX} y: ${adjustedY}`)
+
           var svgns = "http://www.w3.org/2000/svg";
           var popupContainer = document.createElementNS(svgns, 'g');
           popupContainer.id = "popupContainer"
@@ -286,7 +244,7 @@
           popup.style = 'fill: rgb(255,255,255,1);'
           popupContainer.appendChild(popup)
           console.log(popup)
-          var pointer = document.createElementNS(svgns, 'polygon');
+         /* var pointer = document.createElementNS(svgns, 'polygon');
           pointer.id = 'pointer'
           pointer.style.fill = "white"
 
@@ -299,7 +257,7 @@
           }
 
           document.getElementById('billContainer').appendChild(pointer)
-
+*/
        
 
           var popupRightSide = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -462,9 +420,9 @@
                     var alreadyExists = document.getElementById('popupContainer');
                   var parent = alreadyExists.parentNode
                   parent.removeChild(alreadyExists)
-                  var pointer = document.getElementById('pointer');
+                 /* var pointer = document.getElementById('pointer');
                   var pointerParent = pointer.parentNode
-                  pointerParent.removeChild(pointer)
+                  pointerParent.removeChild(pointer)*/
                 clearInterval(timeout)
               }
  
@@ -502,9 +460,10 @@
                 var alreadyExists = document.getElementById('popupContainer');
                 var parent = alreadyExists.parentNode
                 parent.removeChild(alreadyExists)
-                var pointer = document.getElementById('pointer');
+                /*var pointer = document.getElementById('pointer');
                 var pointerParent = pointer.parentNode
                 pointerParent.removeChild(pointer)
+                */
               }
               clearInterval(timeout)
               createPopUpBox(event.srcElement)
