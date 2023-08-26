@@ -19,10 +19,12 @@
           width:100%;
           display: flex;
           justify-content: center;
-/*cursor: none;*/
+          cursor: none;
         }
         #bill{
           margin: 0;
+          cursor: none;
+
           position: absolute;
           top: 50%;
           left: 50%;
@@ -216,17 +218,17 @@
           clickedY = clickedImage.getAttribute('y')
 
           console.log(`initial clicked x ${clickedX} y: ${clickedY}`)
-          pointerTop = false
+          pointerBottom = false
           
           if (clickedY >  (billHeight/2) + 1){
             adjustedX = parseInt(clickedX) - popupWidth/2 + 3
-            adjustedY = parseInt(clickedY)- popupHeight - 11
-            pointerTop = true
+            adjustedY = parseInt(clickedY)- popupHeight - 9
+            pointerBottom = true
           }
 
           else{
             adjustedX = parseInt(clickedX) - popupWidth/2 + 3
-            adjustedY = parseInt(clickedY) + popupHeight/2 - edgeMarginY
+            adjustedY = parseInt(clickedY) + popupHeight/2 - edgeMarginY - 3
           }
 
 
@@ -248,18 +250,15 @@
 
           var pointer = document.createElementNS(svgns, 'polygon');
           pointer.id = 'pointer'
-          console.log(clickedX)
-          console.log( `${parseInt(clickedX)+individualImageWidth+individualImageWidth} ${parseInt(clickedY)}, ${parseInt(clickedX)+individualImageWidth/2}  ${parseInt(clickedY)+5}, ${clickedX}  ${parseInt(clickedY)}`)
           
-          pointer.setAttributeNS(null, 'points', `${parseInt(clickedX)+individualImageWidth-2} ${parseInt(clickedY)-individualImageHeight}, ${parseInt(clickedX)+individualImageWidth/2}  ${parseInt(clickedY)-individualImageHeight-4}, ${parseInt(clickedX)+2}  ${parseInt(clickedY)-individualImageHeight}`); //right, center ,left
+          pointer.setAttributeNS(null, 'points', `${parseInt(clickedX)+individualImageWidth-1} ${parseInt(clickedY)+individualImageHeight*3}, ${parseInt(clickedX)+individualImageWidth/2}  ${parseInt(clickedY)+individualImageHeight+2}, ${parseInt(clickedX)+1}  ${parseInt(clickedY)+individualImageHeight*3}`); //right, center ,left
           
-          if (!pointerTop){
-            pointer.setAttributeNS(null, 'points', `${parseInt(clickedX)+individualImageWidth-2} ${parseInt(clickedY)+individualImageHeight+4}, ${parseInt(clickedX)+individualImageWidth/2}  ${parseInt(clickedY)+individualImageHeight+8}, ${parseInt(clickedX)+2}  ${parseInt(clickedY)+individualImageHeight+4}`); //right, center ,left
+          if (pointerBottom){
+            pointer.setAttributeNS(null, 'points', `${parseInt(clickedX)+individualImageWidth } ${parseInt(clickedY)-individualImageHeight*3}, ${parseInt(clickedX)+individualImageWidth/2}  ${parseInt(clickedY)-individualImageHeight + 1}, ${parseInt(clickedX)}  ${parseInt(clickedY)-individualImageHeight*3}`); //right, center ,left
           }
 
           pointer.style = 'fill: white; stroke-width: 1; stroke: white'
           popupContainer.appendChild(pointer)
-
           var popup = document.createElementNS(svgns, 'rect');
           popup.id = 'popup'
           popup.setAttributeNS(null, 'x', adjustedPosition.x);
