@@ -303,72 +303,72 @@
           popupInnerBox.setAttributeNS(null, 'width', popupWidth-(popupSideMargin*2)-1);
           popupInnerBox.style = ' fill:rgb(255,255,255,0); stroke: rgb(175,175,175); stroke-width: 1px'
           popupContainer.appendChild(popupInnerBox)
-
-
-
           popupContainer.drawing = true
+
+          commandsList = []
+
           fetch(`data/drawing_instructions/${clickedImage.id}.txt`)
-          .then((res) => res.text())
-          .then((text) => {
-            function parseCommand(i) {
-            
-          
-              if ( i < commands.length - 1){
-
-                command = commands[i]
-                if (command.length > 0){
-                  parts = commands[i].split(".")
-                  
-                  if (parts[0] == 'c'){
-                    color = rgbToHex(parts[1], parts[2], parts[3])
-                  }
-
-                  else{
-                    if (parts[0] == 's'){
-                      thickness= (parts[1] / 0.85) * scale
+            .then((res) => res.text())
+            .then((text) => {
+              function parseCommand(i) {
+      
+                  command = commands[i]
+                  if (command.length > 0){
+                    parts = commands[i].split(".")
+                    
+                    if (parts[0] == 'c'){
+                      color = rgbToHex(parts[1], parts[2], parts[3])
                     }
 
-                    else {
-                        thickness = thickness
-                        var newLine = document.createElementNS('http://www.w3.org/2000/svg','line');
+                    else{
+                      if (parts[0] == 's'){
+                        thickness= (parts[1] / 0.85) * scale
+                      }
+
+                      else {
+                          thickness = thickness
+                          var newLine = document.createElementNS('http://www.w3.org/2000/svg','line');
+                          
+                          newLine.setAttribute('x1', parts[0] * scale);
+                          newLine.setAttribute('y1', parts[1] * scale);
+                          newLine.setAttribute('x2',  (parts[2]) * scale );
+                          newLine.setAttribute('y2',(parts[3] * scale));
+                          newLine.setAttribute('stroke-linecap', "round");
+                          newLine.style = ` stroke:${color}; stroke-width: ${thickness}; `
                         
-                        newLine.setAttribute('x1', parts[0] * scale);
-                        newLine.setAttribute('y1', parts[1] * scale);
-                        newLine.setAttribute('x2',  (parts[2]) * scale );
-                        newLine.setAttribute('y2',(parts[3] * scale));
-                        newLine.setAttribute('stroke-linecap', "round");
-                        newLine.style = ` stroke:${color}; stroke-width: ${thickness}; `
-                      
-                        var container = document.getElementById('drawingContainer')
-                        container.appendChild(newLine)
-                        
+                          commandsList.push(newLine)    
+                      }
                     }
                   }
                 }
+              
+              // do something with "text"
+              commands = text.split("drawing=")[1]
+              curCommand = 0;
+              thickness = 1;
+              color = 'black';
+              scale = 0.5
+              commands = commands.split("_");
+              numCommands = commands.length;
+            
+              console.log("HEREEEE")
+              console.log(commands.length)
+              for (var i = 0; i < commands.length-1; i++){
+                parseCommand(i)
               }
-              i++
-              timeout = setTimeout(function () {
-                  parseCommand(i);
-              }, 6);
-            }
-            
-            
-            // do something with "text"
-            commands = text.split("drawing=")[1]
-            curCommand = 0;
-            thickness = 1;
-            color = 'black';
-            scale = 0.5
-            commands = commands.split("_");
-            numCommands = commands.length;
-            var i = 0;
+              console.log(commandsList)
 
-            parseCommand(i)
-          })
-          .catch((e) => console.error(e));
+              for (var i = 0, ln = commandsList.length; i < ln; i++) {
+                setTimeout(function(i) {    
+                  console.log(commandsList[i])
+                  console.log(document.getElementById('drawingContainer'))
+                  document.getElementById('drawingContainer').appendChild(commandsList[i])
+                },  i * 5, i); // we're passing x
+              }
+            }
+          ).catch((e) => console.error(e));
         
           document.getElementById('bill').appendChild(popupContainer);
-        
         }
 
         setupBillSize()
