@@ -350,18 +350,13 @@
               scale = 0.5
               commands = commands.split("_");
               numCommands = commands.length;
-            
-              console.log("HEREEEE")
-              console.log(commands.length)
+
               for (var i = 0; i < commands.length-1; i++){
                 parseCommand(i)
               }
-              console.log(commandsList)
 
               for (var i = 0, ln = commandsList.length; i < ln; i++) {
                 setTimeout(function(i) {    
-                  console.log(commandsList[i])
-                  console.log(document.getElementById('drawingContainer'))
                   document.getElementById('drawingContainer').appendChild(commandsList[i])
                 },  i * 5, i); // we're passing x
               }
