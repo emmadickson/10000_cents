@@ -103,8 +103,7 @@
         var popupSideMargin = 2
 
         var overhangCorrection = 5
-
-        var timeout;
+        var drawingInterval;
 
         /* ------------------------------------------------------------------------------------------------------------------------------------------------------ */
 
@@ -210,7 +209,7 @@
 
         function createPopUpBox(clickedImage){
           billPosition = getBillCoordinates()
-          clearInterval(timeout)
+          clearInterval(drawingInterval)
           clickedImage = event.srcElement
           
           clickedX = clickedImage.getAttribute('x')
@@ -221,14 +220,14 @@
           pointerBottom = false
           
           if (clickedY >  (billHeight/2) + 1){
-            adjustedX = parseInt(clickedX) - popupWidth/2 + 3
+            adjustedX = parseInt(clickedX) - popupWidth/2 + 5
             adjustedY = parseInt(clickedY)- popupHeight - 9
             pointerBottom = true
           }
 
           else{
-            adjustedX = parseInt(clickedX) - popupWidth/2 + 3
-            adjustedY = parseInt(clickedY) + popupHeight/2 - edgeMarginY - 3
+            adjustedX = parseInt(clickedX) - popupWidth/2 + 5
+            adjustedY = parseInt(clickedY) + popupHeight/2 - edgeMarginY - 2
           }
 
 
@@ -355,12 +354,28 @@
                 parseCommand(i)
               }
 
-              for (var i = 0, ln = commandsList.length; i < ln; i++) {
-                setTimeout(function(i) {    
-                  document.getElementById('drawingContainer').appendChild(commandsList[i])
-                },  i * 5, i); // we're passing x
-              }
+              console.log('properly fully parsed all commands')
+              console.log(commandsList.length)
+              console.log(commandsList[0])
+              var x = 0;
+              drawingInterval = setInterval(function() {
+                  // do your loop
+          
+                  if (parseInt(x) >= parseInt(commandsList.length)-1) {
+                    clearInterval(drawingInterval);
+                  }
+                  else{
+                    x+=1
+                    console.log( document.getElementById('drawingContainer'))
+                    console.log(`${parseInt(x) >= parseInt(commandsList.length)} on i ${x} of ${commandsList.length} and commandsList ${commandsList[x]}`)
+
+                    drawingContainerElement =  document.getElementById('drawingContainer')
+                    drawingContainerElement.appendChild(commandsList[x])
+                  }
+              }, 6);
+
             }
+
           ).catch((e) => console.error(e));
         
           document.getElementById('bill').appendChild(popupContainer);
@@ -421,7 +436,7 @@
                 var parent = alreadyExists.parentNode
                 parent.removeChild(alreadyExists)
                 
-                clearInterval(timeout)
+                clearInterval(drawingInterval)
               }
  
               
@@ -453,15 +468,17 @@
           } 
           clickedRect = selectedRect
           clickedRect.style="fill:red; stroke:red; stroke-width:1;  filter:url(#white-glow) "
-         
+          if (interva = undefined){
+            clearInterval(interval)
+          }
           if (document.getElementById('popupContainer') != null ){
+              commandsList = []
                 var alreadyExists = document.getElementById('popupContainer');
                 var parent = alreadyExists.parentNode
                 parent.removeChild(alreadyExists)
               }
-              clearInterval(timeout)
-              console.log(`clicked on `)
-              console.log(event.srcElement)
+              clearInterval(drawingInterval)
+         
               createPopUpBox(event.srcElement)
         }
 
