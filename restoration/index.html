@@ -44,9 +44,9 @@
         <svg id="bill" >
 <defs>
   <filter id="white-glow" x="-5000%" y="-5000%" width="10000%" height="10000%">
-    <feFlood result="flood" flood-color="#FF0000" flood-opacity="0.7"></feFlood>
+    <feFlood result="flood" flood-color="#FF0000" flood-opacity="0.6"></feFlood>
     <feComposite in="flood" result="mask" in2="SourceGraphic" operator="in"></feComposite>
-    <feMorphology in="mask" result="dilated" operator="dilate" radius="2"></feMorphology>
+    <feMorphology in="mask" result="dilated" operator="dilate" radius="1"></feMorphology>
     <feGaussianBlur in="dilated" result="blurred" stdDeviation="5"></feGaussianBlur>
     <feMerge>
         <feMergeNode in="blurred"></feMergeNode>
@@ -356,18 +356,20 @@
 
               console.log('properly fully parsed all commands')
               console.log(commandsList.length)
-              console.log(commandsList[0])
+  
               var x = 0;
               drawingInterval = setInterval(function() {
                   // do your loop
           
                   if (parseInt(x) >= parseInt(commandsList.length)-1) {
                     clearInterval(drawingInterval);
+                    console.log("clear")
+                    
                   }
                   else{
                     x+=1
-                    console.log( document.getElementById('drawingContainer'))
-                    console.log(`${parseInt(x) >= parseInt(commandsList.length)} on i ${x} of ${commandsList.length} and commandsList ${commandsList[x]}`)
+                   // console.log( document.getElementById('drawingContainer'))
+                    //console.log(`${parseInt(x) >= parseInt(commandsList.length)} on i ${x} of ${commandsList.length} and commandsList ${commandsList[x]}`)
 
                     drawingContainerElement =  document.getElementById('drawingContainer')
                     drawingContainerElement.appendChild(commandsList[x])
@@ -417,13 +419,12 @@
           }
 
           if (clickedRect != null){
-            clickedRect.style="fill:red; stroke:red; stroke-width:1; filter:url(#white-glow)"
+            clickedRect.style="fill:red; stroke:red; stroke-width:1; "
 
           }
 
-          if (overX > -1 && overY > -1 && overX <= actualBillWidth && overY <= actualBillHeight){
-           // console.log(`x within bill: ${localX}, y within bill: ${localY}`)
-           // console.log(`adjusted x: ${overX} adjusted y: ${overY}`)
+            console.log(`x within bill: ${localX}, y within bill: ${localY}`)
+            console.log(`adjusted x: ${overX} adjusted y: ${overY}`)
 
             if (clickedRect != null){
               distanceClick = distance(clickedRect.getAttribute('x'), clickedRect.getAttribute('y'), localX+edgeMargin, localY+edgeMarginY)
@@ -441,46 +442,39 @@
  
               
             }
-            
-           
             selectedRect = document.getElementById(id)
             if (selectedRect != clickedRect){
               selectedRect.style = "fill: rgb(255,255,255,0);  stroke:red; stroke-width:1";
 
             }
-          
-
-          }
-          
-
-         
-            
-         
-        
+ 
         }, false);
 
 
         
       document.getElementById('bill').addEventListener('click', function (event) {
-        if (overX > -1 && overY > -1 && overX <= actualBillWidth && overY <= actualBillHeight && event.srcElement.classList.contains('cell')){
-          if (clickedRect != null){
+        if (clickedRect != null){
             clickedRect.style= "fill: rgb(255,255,255,0);  stroke:red; stroke-width:0";
           } 
-          clickedRect = selectedRect
-          clickedRect.style="fill:red; stroke:red; stroke-width:1;  filter:url(#white-glow) "
-          if (interva = undefined){
-            clearInterval(interval)
-          }
-          if (document.getElementById('popupContainer') != null ){
-              commandsList = []
-                var alreadyExists = document.getElementById('popupContainer');
-                var parent = alreadyExists.parentNode
-                parent.removeChild(alreadyExists)
-              }
-              clearInterval(drawingInterval)
-         
-              createPopUpBox(event.srcElement)
+        clickedRect = selectedRect
+
+        clickedRect.style="fill:red; stroke:red; stroke-width:1; "
+        
+        console.log('clicked on')
+        console.log(event.srcElement)
+        
+          
+        clickedRect.style="fill:red; stroke:red; stroke-width:1; "
+      
+        if (document.getElementById('popupContainer') != null ){
+          commandsList = []
+          var alreadyExists = document.getElementById('popupContainer');
+          var parent = alreadyExists.parentNode
+          parent.removeChild(alreadyExists)
         }
+        clearInterval(drawingInterval)
+
+        createPopUpBox(event.srcElement)
 
       }, false);
 
