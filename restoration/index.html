@@ -8,7 +8,7 @@
 
     <style>
        * {
-          shape-rendering: crispEdges;
+          shape-rendering: geometricPrecision;
         }
 
         body{
@@ -19,12 +19,11 @@
           width:100%;
           display: flex;
           justify-content: center;
-          cursor: none;
+         
         }
         #bill{
           margin: 0;
-          cursor: none;
-
+          /*cursor: none;*/
           position: absolute;
           top: 50%;
           left: 50%;
@@ -169,10 +168,10 @@
 
           overlapYPos = 0
 
-          y = edgeMargin + 2
+          y = edgeMargin + 0.5
        
           for (var i = 1; i <= 100; i++){
-              x = edgeMargin + 1
+              x = edgeMargin 
             
               for (var j = 1; j <= 100; j++){
                   
@@ -210,8 +209,8 @@
         function createPopUpBox(clickedImage){
           billPosition = getBillCoordinates()
           clearInterval(drawingInterval)
-          clickedImage = event.srcElement
-          
+          console.log('making pop up based on ')
+          console.log(clickedImage)          
           clickedX = clickedImage.getAttribute('x')
 
           clickedY = clickedImage.getAttribute('y')
@@ -384,10 +383,10 @@
         }
 
         setupBillSize()
-        
+  
         function distance(x1, y1, x2, y2) {
-          var dx = x1 - x2 
-          var dy = y1 - y2 
+          var dx = x2-x1;
+          var dy = y2-y1;
           return Math.sqrt(dx*dx+dy*dy);
         }
 
@@ -396,21 +395,16 @@
 
         window.addEventListener('mousemove', function (event) {
           var offSetRect = document.getElementById('billContainer').getBoundingClientRect()
-          const localX = event.clientX - offSetRect.left  ;//check here first if cass notices fucked up moving mouse around stuff
-          const localY = event.clientY - offSetRect.top  ;
+          const localX = event.clientX - offSetRect.left 
+          const localY = event.clientY - offSetRect.top  
           localMousePos = { x: localX, y: localY };
           
-          overX = Math.floor((localX)/8)*8;
-          overY = Math.floor((localY)/3.4)*3.4;
+          overX = Math.floor((localX)/8);
+          overY = Math.floor((localY)/3.4);
 
-          overX = Math.round(overX * 10) / 10
-          overY = Math.round(overY * 10) / 10;
 
-          rectX = (overX/8) + 1
-          rectY = (overY/3.4) + 1
-
-          rectX = Math.floor(rectX)
-          rectY = Math.floor(rectY)
+          rectX = Math.floor(overX) + 1 
+          rectY = Math.floor(overY) + 1
 
           id = `${rectX}.${rectY}`
 
@@ -427,9 +421,11 @@
             console.log(`adjusted x: ${overX} adjusted y: ${overY}`)
 
             if (clickedRect != null){
-              distanceClick = distance(clickedRect.getAttribute('x'), clickedRect.getAttribute('y'), localX+edgeMargin, localY+edgeMarginY)
+              distanceClick = distance(clickedRect.getAttribute('x'), clickedRect.getAttribute('y'), localX+edgeMargin, localY+edgeMargin)
 
              if ( distanceClick > 10 ) {
+              console.log("relevant")
+
                 clickedRect.style = "fill: rgb(255,255,255,0);  stroke:red; stroke-width:0";
                 clickedRect = null;
                 selectedRect.style= "fill: rgb(255,255,255,0);  stroke:red; stroke-width:0";
@@ -461,8 +457,7 @@
         clickedRect.style="fill:red; stroke:red; stroke-width:1; "
         
         console.log('clicked on')
-        console.log(event.srcElement)
-        
+        console.log(clickedRect)
           
         clickedRect.style="fill:red; stroke:red; stroke-width:1; "
       
@@ -474,7 +469,7 @@
         }
         clearInterval(drawingInterval)
 
-        createPopUpBox(event.srcElement)
+        createPopUpBox(selectedRect)
 
       }, false);
 
