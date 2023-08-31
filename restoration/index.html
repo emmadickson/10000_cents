@@ -41,18 +41,18 @@
 
     
         <svg id="bill" >
-<defs>
-  <filter id="white-glow" x="-5000%" y="-5000%" width="10000%" height="10000%">
-    <feFlood result="flood" flood-color="#FF0000" flood-opacity="0.6"></feFlood>
-    <feComposite in="flood" result="mask" in2="SourceGraphic" operator="in"></feComposite>
-    <feMorphology in="mask" result="dilated" operator="dilate" radius="1"></feMorphology>
-    <feGaussianBlur in="dilated" result="blurred" stdDeviation="5"></feGaussianBlur>
-    <feMerge>
-        <feMergeNode in="blurred"></feMergeNode>
-        <feMergeNode in="SourceGraphic"></feMergeNode>
-    </feMerge>
-</filter>
-</defs>
+          <defs>
+            <filter id="white-glow" x="-5000%" y="-5000%" width="10000%" height="10000%">
+              <feFlood result="flood" flood-color="#FF0000" flood-opacity="0.65"></feFlood>
+              <feComposite in="flood" result="mask" in2="SourceGraphic" operator="in"></feComposite>
+              <feMorphology in="mask" result="dilated" operator="dilate" radius="2"></feMorphology>
+              <feGaussianBlur in="dilated" result="blurred" stdDeviation="5"></feGaussianBlur>
+              <feMerge>
+                  <feMergeNode in="blurred"></feMergeNode>
+                  <feMergeNode in="SourceGraphic"></feMergeNode>
+              </feMerge>
+          </filter>
+          </defs>
           <g  id="videoContainer">
             <foreignobject  id="billForeignObject" x="0" y="0" width="801" height="342">
               <video width="800" height="342" autoplay="true" muted="true" >
@@ -117,7 +117,7 @@
               highlights = document.getElementsByClassName('cell')
               if (showGrid){
                 for (var i = 0; i < highlights.length; i++){
-                  highlights[i].style = 'fill: rgb(255,255,255,0); stroke: red; stroke-width: 1'
+                  highlights[i].style = 'fill: rgb(255,255,255,0); stroke: red; stroke-width: 1; filter:url(#white-glow)'
                 }
               }
              else{
@@ -209,13 +209,10 @@
         function createPopUpBox(clickedImage){
           billPosition = getBillCoordinates()
           clearInterval(drawingInterval)
-          console.log('making pop up based on ')
-          console.log(clickedImage)          
           clickedX = clickedImage.getAttribute('x')
 
           clickedY = clickedImage.getAttribute('y')
 
-          console.log(`initial clicked x ${clickedX} y: ${clickedY}`)
           pointerBottom = false
           
           if (clickedY >  (billHeight/2) + 1){
@@ -239,7 +236,6 @@
           }
        
           adjustedPosition = {'x': adjustedX, 'y': adjustedY}
-          console.log(`adjusted position x: ${adjustedX} y: ${adjustedY}`)
  
           var svgns = "http://www.w3.org/2000/svg";
           var popupContainer = document.createElementNS(svgns, 'g');
@@ -249,10 +245,10 @@
           var pointer = document.createElementNS(svgns, 'polygon');
           pointer.id = 'pointer'
           
-          pointer.setAttributeNS(null, 'points', `${parseInt(clickedX)+individualImageWidth-1} ${parseInt(clickedY)+individualImageHeight*3}, ${parseInt(clickedX)+individualImageWidth/2}  ${parseInt(clickedY)+individualImageHeight+2}, ${parseInt(clickedX)+1}  ${parseInt(clickedY)+individualImageHeight*3}`); //right, center ,left
+          pointer.setAttributeNS(null, 'points', `${parseInt(clickedX)+individualImageWidth-1} ${parseInt(clickedY)+individualImageHeight*3+1}, ${parseInt(clickedX)+individualImageWidth/2}  ${parseInt(clickedY)+individualImageHeight+3}, ${parseInt(clickedX)+1}  ${parseInt(clickedY)+individualImageHeight*3+1}`); //right, center ,left
           
           if (pointerBottom){
-            pointer.setAttributeNS(null, 'points', `${parseInt(clickedX)+individualImageWidth } ${parseInt(clickedY)-individualImageHeight*3}, ${parseInt(clickedX)+individualImageWidth/2}  ${parseInt(clickedY)-individualImageHeight + 1}, ${parseInt(clickedX)}  ${parseInt(clickedY)-individualImageHeight*3}`); //right, center ,left
+            pointer.setAttributeNS(null, 'points', `${parseInt(clickedX)+individualImageWidth } ${parseInt(clickedY)-individualImageHeight*3+1}, ${parseInt(clickedX)+individualImageWidth/2}  ${parseInt(clickedY)-individualImageHeight + 2}, ${parseInt(clickedX)}  ${parseInt(clickedY)-individualImageHeight*3+1}`); //right, center ,left
           }
 
           pointer.style = 'fill: white; stroke-width: 1; stroke: white'
@@ -352,9 +348,6 @@
               for (var i = 0; i < commands.length-1; i++){
                 parseCommand(i)
               }
-
-              console.log('properly fully parsed all commands')
-              console.log(commandsList.length)
   
               var x = 0;
               drawingInterval = setInterval(function() {
@@ -367,9 +360,6 @@
                   }
                   else{
                     x+=1
-                   // console.log( document.getElementById('drawingContainer'))
-                    //console.log(`${parseInt(x) >= parseInt(commandsList.length)} on i ${x} of ${commandsList.length} and commandsList ${commandsList[x]}`)
-
                     drawingContainerElement =  document.getElementById('drawingContainer')
                     drawingContainerElement.appendChild(commandsList[x])
                   }
@@ -416,16 +406,10 @@
             clickedRect.style="fill:red; stroke:red; stroke-width:1; "
 
           }
-
-            console.log(`x within bill: ${localX}, y within bill: ${localY}`)
-            console.log(`adjusted x: ${overX} adjusted y: ${overY}`)
-
             if (clickedRect != null){
               distanceClick = distance(clickedRect.getAttribute('x'), clickedRect.getAttribute('y'), localX+edgeMargin, localY+edgeMargin)
 
              if ( distanceClick > 10 ) {
-              console.log("relevant")
-
                 clickedRect.style = "fill: rgb(255,255,255,0);  stroke:red; stroke-width:0";
                 clickedRect = null;
                 selectedRect.style= "fill: rgb(255,255,255,0);  stroke:red; stroke-width:0";
@@ -453,13 +437,7 @@
             clickedRect.style= "fill: rgb(255,255,255,0);  stroke:red; stroke-width:0";
           } 
         clickedRect = selectedRect
-
-        clickedRect.style="fill:red; stroke:red; stroke-width:1; "
-        
-        console.log('clicked on')
-        console.log(clickedRect)
-          
-        clickedRect.style="fill:red; stroke:red; stroke-width:1; "
+        clickedRect.style="fill:red; stroke:red; stroke-width:1; filter:url(#white-glow)"
       
         if (document.getElementById('popupContainer') != null ){
           commandsList = []
