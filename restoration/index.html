@@ -1,4 +1,11 @@
 <!DOCTYPE html>
+<!--DOCUMENTATION
+AUTHOR: Emma Dickson
+DATE: 08/2023
+PIECE: TEN THOUSAND CENTS (2008), Aaron Koblin + Takashi Kawashima
+MEDICAL HISTORY:
+  08/2023: Completed migration of the original piece to JavaScript
+-->
 <html lang="en">
   <head>
     <meta charset="UTF-8">
@@ -35,36 +42,31 @@
   
     </style>
 
-    </head>
+  </head>
 
-    <body>
-
-    
-        <svg id="bill" >
-          <defs>
-            <filter id="white-glow" x="-5000%" y="-5000%" width="10000%" height="10000%">
-              <feFlood result="flood" flood-color="#FF0000" flood-opacity="0.65"></feFlood>
-              <feComposite in="flood" result="mask" in2="SourceGraphic" operator="in"></feComposite>
-              <feMorphology in="mask" result="dilated" operator="dilate" radius="2"></feMorphology>
-              <feGaussianBlur in="dilated" result="blurred" stdDeviation="5"></feGaussianBlur>
-              <feMerge>
-                  <feMergeNode in="blurred"></feMergeNode>
-                  <feMergeNode in="SourceGraphic"></feMergeNode>
-              </feMerge>
-          </filter>
-          </defs>
-          <g  id="videoContainer">
-            <foreignobject  id="billForeignObject" x="0" y="0" width="801" height="342">
-              <video width="800" height="342" autoplay="true" muted="true" >
-                <source src="assets/bill_convert.mp4" type="video/mp4">
-              </video>
-            </foreignobject>
-            <g  id="billContainer"></g>
-
-          </g>
-
-        </svg> 
- 
+  <body>
+      <svg id="bill" >
+        <defs>
+          <filter id="white-glow" x="-5000%" y="-5000%" width="10000%" height="10000%">
+            <feFlood result="flood" flood-color="#FF0000" flood-opacity="0.5"></feFlood>
+            <feComposite in="flood" result="mask" in2="SourceGraphic" operator="in"></feComposite>
+            <feMorphology in="mask" result="dilated" operator="dilate" radius="2"></feMorphology>
+            <feGaussianBlur in="dilated" result="blurred" stdDeviation="5"></feGaussianBlur>
+            <feMerge>
+                <feMergeNode in="blurred"></feMergeNode>
+                <feMergeNode in="SourceGraphic"></feMergeNode>
+            </feMerge>
+        </filter>
+        </defs>
+        <g  id="videoContainer">
+          <foreignobject  id="billForeignObject" x="0" y="0" width="801" height="342">
+            <video width="800" height="342" autoplay="true" muted="true" >
+              <source src="assets/bill_convert.mp4" type="video/mp4">
+            </video>
+          </foreignobject>
+          <g  id="billContainer"></g>
+        </g>
+      </svg> 
 
       <script>
         
@@ -76,7 +78,7 @@
         var svgns = "http://www.w3.org/2000/svg";
         var showGrid = false
 
-        // Sets height of the red cursor
+        // Sets size of the red cursor
         var individualImageWidth = 8;
         var individualImageHeight = 4;
 
@@ -101,36 +103,10 @@
         var popupSideWidth = 203
         var popupSideMargin = 2
 
-        var overhangCorrection = 5
         var drawingInterval;
 
-        /* ------------------------------------------------------------------------------------------------------------------------------------------------------ */
+        /* ------------------------------------------------------------------------------------------------------------------------------------------------------ *
 
-       
-        /* DEBUG */
-
-        // FOR DEBUG ONLY, overlays the grid on the bill
-        document.onkeypress = function (e) {
-            e = e || window.event;
-            if (e.keyCode == 99){
-              showGrid = !showGrid
-              highlights = document.getElementsByClassName('cell')
-              if (showGrid){
-                for (var i = 0; i < highlights.length; i++){
-                  highlights[i].style = 'fill: rgb(255,255,255,0); stroke: red; stroke-width: 1; filter:url(#white-glow)'
-                }
-              }
-             else{
-                for (var i = 0; i < highlights.length; i++){
-                  highlights[i].style = 'fill: rgb(255,255,255,0); stroke: red; stroke-width: 0'
-                }
-              }
-            }
-        };
-
-        /* ------------------------------------------------------------------------------------------------------------------------------------------------------ */
-
-        
         /* GENERAL FUNCTIONS */
 
         /* Fetches the local instruction file*/
@@ -152,8 +128,16 @@
           return "#" + (1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1);
         }
         
+        /* Finds distance between pixels for mousing away */
+        function distance(x1, y1, x2, y2) {
+          var dx = x2-x1;
+          var dy = y2-y1;
+          return Math.sqrt(dx*dx+dy*dy);
+        }
+
         /* ------------------------------------------------------------------------------------------------------------------------------------------------------ */
 
+        /* BILL/POPUP FUNCTIONALITY */
 
         /* Creates the grid that will ovrlay the bill and allow us to select particular images*/
         function setupBillSize(){
@@ -198,16 +182,10 @@
                }
            
           }
-      }
-
-    
-
-        function getBillCoordinates(){
-          return {'x1': edgeMargin, 'y1': edgeMarginY}
         }
 
+        /* Creates the popup that will show drawings */
         function createPopUpBox(clickedImage){
-          billPosition = getBillCoordinates()
           clearInterval(drawingInterval)
           clickedX = clickedImage.getAttribute('x')
 
@@ -217,7 +195,7 @@
           
           if (clickedY >  (billHeight/2) + 1){
             adjustedX = parseInt(clickedX) - popupWidth/2 + 4
-            adjustedY = parseInt(clickedY)- popupHeight - 9
+            adjustedY = parseInt(clickedY)- popupHeight - 8
             pointerBottom = true
           }
 
@@ -370,19 +348,11 @@
           ).catch((e) => console.error(e));
         
           document.getElementById('bill').appendChild(popupContainer);
-        }
-
-        setupBillSize()
-  
-        function distance(x1, y1, x2, y2) {
-          var dx = x2-x1;
-          var dy = y2-y1;
-          return Math.sqrt(dx*dx+dy*dy);
-        }
-
+        }  
 
         /* MOUSE FUNCTIONS */
 
+        /* Handles the mousemove functionality, this is what lights up the cursor */
         window.addEventListener('mousemove', function (event) {
           var offSetRect = document.getElementById('billContainer').getBoundingClientRect()
           const localX = event.clientX - offSetRect.left 
@@ -409,7 +379,7 @@
             if (clickedRect != null){
               distanceClick = distance(clickedRect.getAttribute('x'), clickedRect.getAttribute('y'), localX+edgeMargin, localY+edgeMargin)
 
-             if ( distanceClick > 10 ) {
+              if ( distanceClick > 10 ) {
                 clickedRect.style = "fill: rgb(255,255,255,0);  stroke:red; stroke-width:0";
                 clickedRect = null;
                 selectedRect.style= "fill: rgb(255,255,255,0);  stroke:red; stroke-width:0";
@@ -419,7 +389,7 @@
                 
                 clearInterval(drawingInterval)
               }
- 
+
               
             }
             selectedRect = document.getElementById(id)
@@ -427,34 +397,36 @@
               selectedRect.style = "fill: rgb(255,255,255,0);  stroke:red; stroke-width:1";
 
             }
- 
+
         }, false);
 
-
+        /* Handles the click functionality, this is what creates the popup */
+        document.getElementById('bill').addEventListener('click', function (event) {
+          if (clickedRect != null){
+              clickedRect.style= "fill: rgb(255,255,255,0);  stroke:red; stroke-width:0";
+            } 
+          clickedRect = selectedRect
+          clickedRect.style="fill:red; stroke:red; stroke-width:1; filter:url(#white-glow)"
         
-      document.getElementById('bill').addEventListener('click', function (event) {
-        if (clickedRect != null){
-            clickedRect.style= "fill: rgb(255,255,255,0);  stroke:red; stroke-width:0";
-          } 
-        clickedRect = selectedRect
-        clickedRect.style="fill:red; stroke:red; stroke-width:1; filter:url(#white-glow)"
-      
-        if (document.getElementById('popupContainer') != null ){
-          commandsList = []
-          var alreadyExists = document.getElementById('popupContainer');
-          var parent = alreadyExists.parentNode
-          parent.removeChild(alreadyExists)
-        }
-        clearInterval(drawingInterval)
+          if (document.getElementById('popupContainer') != null ){
+            commandsList = []
+            var alreadyExists = document.getElementById('popupContainer');
+            var parent = alreadyExists.parentNode
+            parent.removeChild(alreadyExists)
+          }
+          clearInterval(drawingInterval)
 
-        createPopUpBox(selectedRect)
+          createPopUpBox(selectedRect)
 
-      }, false);
+        }, false);
 
         /* ------------------------------------------------------------------------------------------------------------------------------------------------------ */
 
+        // Main function, sets up the bill and runs the piece
+        setupBillSize()
+
       </script>
 
-    </body>
+  </body>
 
 </html>
