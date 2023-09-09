@@ -226,7 +226,7 @@ MEDICAL HISTORY:
           pointer.setAttributeNS(null, 'points', `${parseInt(clickedX)+individualImageWidth-1} ${parseInt(clickedY)+individualImageHeight*3+1}, ${parseInt(clickedX)+individualImageWidth/2}  ${parseInt(clickedY)+individualImageHeight+3}, ${parseInt(clickedX)+1}  ${parseInt(clickedY)+individualImageHeight*3+1}`); //right, center ,left
           
           if (pointerBottom){
-            pointer.setAttributeNS(null, 'points', `${parseInt(clickedX)+individualImageWidth } ${parseInt(clickedY)-individualImageHeight*3+1}, ${parseInt(clickedX)+individualImageWidth/2}  ${parseInt(clickedY)-individualImageHeight + 2}, ${parseInt(clickedX)}  ${parseInt(clickedY)-individualImageHeight*3+1}`); //right, center ,left
+            pointer.setAttributeNS(null, 'points', `${parseInt(clickedX)+individualImageWidth } ${parseInt(clickedY)-individualImageHeight*3+1}, ${parseInt(clickedX)+individualImageWidth/2}  ${parseInt(clickedY)-individualImageHeight + 3}, ${parseInt(clickedX)}  ${parseInt(clickedY)-individualImageHeight*3+1}`); //right, center ,left
           }
 
           pointer.style = 'fill: white; stroke-width: 1; stroke: white'
