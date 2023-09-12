@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--DOCUMENTATION
-AUTHOR: Emma Dickson
+AUTHOR: Emma Dickson, Cass Fino-Radin
 DATE: 08/2023
 PIECE: TEN THOUSAND CENTS (2008), Aaron Koblin + Takashi Kawashima
 MEDICAL HISTORY:
@@ -156,7 +156,7 @@ MEDICAL HISTORY:
           y = edgeMargin + 1.5
        
           for (var i = 1; i <= 100; i++){
-              x = edgeMargin + 1
+              x = edgeMargin
             
               for (var j = 1; j <= 100; j++){
                   
@@ -227,7 +227,7 @@ MEDICAL HISTORY:
           pointer.setAttributeNS(null, 'points', `${parseInt(clickedX)+individualImageWidth-1} ${parseInt(clickedY)+individualImageHeight*3+1}, ${parseInt(clickedX)+individualImageWidth/2}  ${parseInt(clickedY)+individualImageHeight+3}, ${parseInt(clickedX)+1}  ${parseInt(clickedY)+individualImageHeight*3+1}`); //right, center ,left
           
           if (pointerBottom){
-            pointer.setAttributeNS(null, 'points', `${parseInt(clickedX)+individualImageWidth } ${parseInt(clickedY)-individualImageHeight*3+1}, ${parseInt(clickedX)+individualImageWidth/2}  ${parseInt(clickedY)-individualImageHeight + 2}, ${parseInt(clickedX)}  ${parseInt(clickedY)-individualImageHeight*3+1}`); //right, center ,left
+            pointer.setAttributeNS(null, 'points', `${parseInt(clickedX)+individualImageWidth } ${parseInt(clickedY)-individualImageHeight*3+1}, ${parseInt(clickedX)+individualImageWidth/2}  ${parseInt(clickedY)-individualImageHeight + 3}, ${parseInt(clickedX)}  ${parseInt(clickedY)-individualImageHeight*3+1}`); //right, center ,left
           }
 
           pointer.style = 'fill: white; stroke-width: 1; stroke: white'
